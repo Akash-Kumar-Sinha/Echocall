@@ -1,9 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-import Name from "./Name";
-import ProfileImage from "./ProfileImage";
-import Loading from "../../utils/Loading";
+import Name from "../components/Profile/Name";
+import ProfileImage from "../components/Profile/ProfileImage";
+import Loading from "../utils/Loading";
 
 interface ProfileData {
   id: string;
@@ -33,7 +33,7 @@ const Profile = () => {
             },
           }
         );
-
+        
         setProfile(response.data.profile);
       } catch (error) {
         console.log("Fetching user info");
@@ -59,7 +59,7 @@ const Profile = () => {
           <div className="text-2xl mb-4">
             Profile
             <span>
-              <ProfileImage imageUrl={profile?.image} />
+              <ProfileImage imageUrl={profile?.image} width={24}/>
             </span>
           </div>
           <div>

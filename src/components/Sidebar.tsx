@@ -17,14 +17,14 @@ const Sidebar = () => {
               }`}
             >
               <NavLink to={item.href}>
-                <div className="flex items-center gap-10">
+                <div className="flex items-center gap-10 font-bold">
                   {React.createElement(item.icon, {
                     size: 32,
-                    className: item.active ? "text-yellow-600" : "text-white",
+                    className: item.active ? "text-yellow-600" : "yellow-50",
                   })}
                   <span
                     className={`hidden ${
-                      item.active ? "text-yellow-800" : "text-white"
+                      item.active ? "text-yellow-800" : "yellow-50"
                     }`}
                   >
                     {item.label}

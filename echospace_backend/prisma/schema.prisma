@@ -15,19 +15,19 @@ datasource db {
 
 model EmailCollection {
   id        String   @id @default(uuid())
-  email String
+  email     String
   createdAt DateTime @default(now())
 }
 
 model EmailVerification {
-  id        String   @id @default(uuid())
-  email             String @unique
+  id                String  @id @default(uuid())
+  email             String  @unique
   verificationToken String
-  verification Boolean @default(false)
+  verification      Boolean @default(false)
 }
 
 model Emailname {
-  id       String   @id @default(uuid())
+  id       String @id @default(uuid())
   email    String @unique
   username String @unique
 }
@@ -38,8 +38,9 @@ model User {
   password  String
   username  String   @unique
   createdAt DateTime @default(now())
-  userId    String     @unique
-  profile   Profile?
+
+  userId  String   @unique
+  profile Profile?
 
   @@unique([email, username])
 }
@@ -49,7 +50,48 @@ model Profile {
   username  String   @unique
   createdAt DateTime @default(now())
   image     String?
-  userId    String 
+  userId    String   @unique
 
-  user      User @relation(fields: [id], references: [userId])
+  user User @relation(fields: [userId], references: [userId])
+
+  requests Request[]
+
+  accepted Accepted[]
+}
+
+model Request {
+  id         String    @id @default(uuid())
+  senderId   String
+  receiverId String
+  sentAt     DateTime  @default(now())
+  acceptedAt DateTime?
+  accept     Boolean?  @default(false)
+
+  accepted Accepted[]
+
+  sender Profile @relation(fields: [senderId], references: [userId])
+
+  @@unique([senderId, receiverId])
+}
+
+model Accepted {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  acceptedAt DateTime @default(now())
+
+  requestId String  @unique
+  request   Request @relation(fields: [requestId], references: [id])
+
+  profileId String  @unique
+  profile   Profile @relation(fields: [profileId], references: [userId])
+}
+
+model Connection {
+  id        String @id @default(uuid())
+  requestId String
+  user1Id   String
+  user2Id   String
+
+  @@unique([user1Id, user2Id])
 }

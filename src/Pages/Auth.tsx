@@ -144,7 +144,7 @@ const Auth = () => {
         {loaded && (
           <div className="lg:w-96 bg-gradient-to-br from-yellow-700 to-yellow-800 p-8 rounded-lg shadow-lg flex flex-col items-center max-w-md transition-all duration-300 ease-in-out transform hover:scale-105">
             <div className="bg-gradient-to-br from-yellow-600 to-yellow-800 rounded-full p-3 mb-4 shadow-lg">
-              <FaLock className="text-white text-5xl" />
+              <FaLock className="text-yellow-50 text-5xl" />
             </div>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="w-full flex flex-col mb-4 ">
@@ -197,7 +197,7 @@ const Auth = () => {
                 <button
                   type="button"
                   onClick={onClickNext}
-                  className="bg-yellow-700 hover:bg-yellow-800 text-white font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
+                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
                 >
                   Verify
                 </button>
@@ -207,7 +207,7 @@ const Auth = () => {
                 <button
                   type="button"
                   onClick={onClickNext}
-                  className="bg-yellow-700 hover:bg-yellow-800 text-white font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
+                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
                 >
                   Next
                 </button>
@@ -215,7 +215,7 @@ const Auth = () => {
               {variant === "FINAL" && (
                 <button
                   type="submit"
-                  className="bg-yellow-700 hover:bg-yellow-800 text-white font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
+                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
                 >
                   {submitting ? "Signing in..." : "Sign in"}
                 </button>

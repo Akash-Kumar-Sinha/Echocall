@@ -6,7 +6,7 @@ import createUsername from "../controller/Authenticate/createUsername";
 import createUser from "../controller/Authenticate/createUser";
 import checkVerification from "../middleware/checkVerification";
 import loginUser from "../controller/Authenticate/loginUser";
-import getUser from "../controller/Authenticate/getUser";
+import getUser from "../controller/Users/getUser";
 
 const router = express.Router();
 
