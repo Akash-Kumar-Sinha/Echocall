@@ -12,16 +12,16 @@ const getUser = async (req: Request, res: Response) => {
     jwt.verify(token, "JWT_SECRET_KEY", async (err, decodedToken) => {
       if (err) return res.status(403).send({ error: "Forbidden" });
       // const profileId = id;
-      const userId = (decodedToken as { id: string }).id;
+      const userId = (decodedToken as { userId: string }).userId;
 
       try {
         const foundUser = await prisma.user.findUnique({
-          where: { id: userId },
+          where: { userId: userId },
         });
         if (!foundUser)
           return res.status(404).send({ error: "User not found" });
         const profile = await prisma.profile.findUnique({
-          where: { id: foundUser.userId },
+          where: { userId: foundUser.userId },
         });
         return res.status(200).send({ profile: profile });
       } catch (error) {

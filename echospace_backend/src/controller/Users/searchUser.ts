@@ -4,9 +4,9 @@ import prisma from "../../db/prismaDb";
 const searchUser = async (req: Request, res: Response) => {
   try {
     const searchData = req.query.data as { search?: string };
-    const search = searchData.search
+    const search = searchData.search;
     if (search) {
-      const user = await prisma.profile.findMany({
+      const users = await prisma.profile.findMany({
         where: {
           OR: [
             {
@@ -22,8 +22,30 @@ const searchUser = async (req: Request, res: Response) => {
           ],
         },
       });
-      if (user) {
-        return res.status(200).send({ otheruser: user });
+      if (users) {
+        if (users.length > 0) {
+          const userResults = await Promise.all(
+            users.map(async (user) => {
+              const connections = await prisma.connection.findMany({
+                where: {
+                  OR: [
+                    {
+                      user1Id: user.userId,
+                    },
+                    {
+                      user2Id: user.userId,
+                    },
+                  ],
+                },
+              });
+              return {
+                ...user,
+                hasConnection: connections.length > 0,
+              };
+            })
+          );
+          return res.status(200).send({ otheruser: userResults });
+        }
       }
       return res.status(404).send({ message: "User does not exist" });
     }

@@ -3,12 +3,13 @@ import Input from "../components/Input";
 import axios from "axios";
 import { useState } from "react";
 import NameSection from "../components/Profile/NameSection";
-import Add from "../components/Profile/Add";
+import getCurrentUser from "../utils/getCurrentUser";
 
 interface Profile {
   username: string;
   image: string | null;
   userId: string;
+  hasConnection: boolean
 }
 
 const SearchBar = () => {
@@ -24,19 +25,8 @@ const SearchBar = () => {
 
   const findCurrentUser = async () => {
     try {
-      const token = sessionStorage.getItem(
-        `${import.meta.env.VITE_TOKEN_NAME}`
-      );
-
-      const response = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/get/userinfo`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setCurrentUser(response.data.profile);
+      const user = await getCurrentUser();
+      setCurrentUser(user);
     } catch (error) {
       console.log("Fetching user info");
     }
@@ -61,9 +51,21 @@ const SearchBar = () => {
         }
       );
       setOtherUser(filteredOtherUsers);
-      console.log(otherUser);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleAddFriend = async (receiverId: string) => {
+    try {
+      const senderId = currentUser?.userId;
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}/get/sendrequest`,
+        { senderId, receiverId }
+      );
+      console.log(response);
+    } catch (error) {
+      console.log("error in sending request", error);
     }
   };
 
@@ -101,15 +103,24 @@ const SearchBar = () => {
                   className="flex px-4 items-center justify-between p-2 lg:w-96 bg-yellow-50 rounded-lg shadow-lg text-black"
                 >
                   <div className="">
-                  <NameSection
-                    name={user.username}
-                    imageUrl={user.image}
-                    width={8}
-                    textsize="xl"
-                    textColor="text-zinc-900"
+                    <NameSection
+                      name={user.username}
+                      imageUrl={user.image}
+                      width={8}
+                      textsize="xl"
+                      textColor="text-zinc-900"
                     />
-                    </div>
-                  <Add/>
+                  </div>
+                  {!user.hasConnection &&
+                  <button
+                    onClick={() => {
+                      handleAddFriend(user.userId);
+                    }}
+                    className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
+                    >
+                    Add Friend
+                  </button>
+                  }
                 </li>
               ))}
             </ul>

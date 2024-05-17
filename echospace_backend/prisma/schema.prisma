@@ -83,7 +83,7 @@ model Accepted {
   requestId String  @unique
   request   Request @relation(fields: [requestId], references: [id])
 
-  profileId String  @unique
+  profileId String 
   profile   Profile @relation(fields: [profileId], references: [userId])
 }
 

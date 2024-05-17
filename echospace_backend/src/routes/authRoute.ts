@@ -6,7 +6,6 @@ import createUsername from "../controller/Authenticate/createUsername";
 import createUser from "../controller/Authenticate/createUser";
 import checkVerification from "../middleware/checkVerification";
 import loginUser from "../controller/Authenticate/loginUser";
-import getUser from "../controller/Users/getUser";
 
 const router = express.Router();
 
@@ -15,8 +14,6 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 router.post("/send", sendToken);
-
-router.post("/getuser", getUser);
 
 router.get("/verify/:email/:token", verifyToken);
 
