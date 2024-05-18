@@ -48,7 +48,7 @@ const Auth = () => {
           .post(`${import.meta.env.VITE_SERVER_URL}/auth/signup`, data)
           .then((response) => {
             sessionStorage.setItem(`${import.meta.env.VITE_TOKEN_NAME}`, response.data.token)
-            navigate("/home");
+            navigate("/search");
           });
       }
       if (idstatus === "LOGIN") {
@@ -59,7 +59,7 @@ const Auth = () => {
         
         sessionStorage.setItem(`${import.meta.env.VITE_TOKEN_NAME}`, response.data.token)
         if (response.status === 200) {
-          navigate("/home");
+          navigate("/search");
         }
       }
     } catch (error) {

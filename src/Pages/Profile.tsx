@@ -87,19 +87,15 @@ const Profile = () => {
           },
         }
       );
-      // console.log(response.data.calledUser);
       setCallLists(response.data.calledUser);
-      console.log("callList", callLists);
     } catch (error) {
       console.log("Unable to fetch requests:", error);
     }
   };
 
   const acceptRequest = async (senderId: string) => {
-    console.log("aksdljf", senderId);
     try {
       const receiverId = profile?.userId;
-      console.log("aksdljf", receiverId);
 
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/get/acceptrequest`,
@@ -125,7 +121,6 @@ const Profile = () => {
         }
       );
       setConnectionList(response.data.connections);
-      console.log(response.data);
     } catch (error) {
       console.log("Unable to fetch requests:", error);
     }

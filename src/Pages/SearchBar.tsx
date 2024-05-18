@@ -36,7 +36,6 @@ const SearchBar = () => {
     setButtonClicked(true);
     const currentUserId = currentUser?.userId
     const search = data.search
-    console.log(data.search)
     try {
       if (!currentUserId) {
         console.error('currentUserId is not defined');
@@ -52,7 +51,6 @@ const SearchBar = () => {
           params: { search,currentUserId },
         }
       );
-      console.log(response.data.otheruser)
       setOtherUser(response.data.otheruser);
     } catch (error) {
       console.log(error);

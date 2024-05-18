@@ -62,7 +62,7 @@ const searchUser = async (req: Request, res: Response) => {
         return res.status(200).send({ otheruser: userResults });
       }
 
-      return res.status(404).send({ message: "No users found" });
+      return res.status(200).send({ message: "No users found", otheruser: users });
     }
 
     return res.status(400).send({ message: "Search query not provided" });

@@ -13,9 +13,9 @@ const useRoute = () => {
     () => [
       {
         label: "Home",
-        href: "/home",
+        href: "/home/:id",
         icon: BiSpaceBar,
-        active: pathname === "/home",
+        active: pathname.startsWith("/home"),
       },
       {
         label: "Search",
