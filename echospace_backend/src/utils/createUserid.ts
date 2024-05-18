@@ -10,7 +10,7 @@ const createUserId = async (username: string) => {
   
     do {
       const randomNumber = generateRandomNumber();
-      uniqueUserId = `${username}${randomNumber}`;
+      uniqueUserId = `${username}#${randomNumber}`;
   
       userExists = await prisma.user.findUnique({
         where: { userId: uniqueUserId },

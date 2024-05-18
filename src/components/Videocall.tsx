@@ -16,8 +16,6 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
   const navigate = useNavigate();
 
   const handleRoomJoined = ({ callId }: { callId: string }) => {
-    console.log("callId", callId);
-
     navigate(`/home/${callId}`);
   };
 
@@ -27,7 +25,6 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
 
   const vCall = async () => {
     const current = await getCurrentUser();
-    console.log("current", current.userId);
     const senderUserId = current.userId;
     const receiverUsername = username;
     if (roomId) {

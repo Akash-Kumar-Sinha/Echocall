@@ -41,7 +41,6 @@ const Auth = () => {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setSubmitting(true);
 
-    console.log(data);
     try {
       if (idstatus === "SIGNUP") {
         await axios

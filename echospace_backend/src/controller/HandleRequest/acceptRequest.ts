@@ -33,10 +33,6 @@ const acceptRequest = async (req: Request, res: Response) => {
     if (!request) {
       return res.status(404).send({ message: "Request does not exist" });
     }
-    console.log(senderId)
-    console.log(receiverId)
-    console.log(request.id)
-    console.log(senderId)
 
     const acceptedRequest = await prisma.accepted.create({
       data: {

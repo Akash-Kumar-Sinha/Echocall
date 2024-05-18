@@ -45,13 +45,14 @@ io.on("connection", (socket) => {
   console.log(`User connected`);
   socket.on("Join-call", (data) => {
     const { userId, username, callId } = data;
-    // console.log("userId", userId);
-    // console.log("username", username);
-    // console.log("callId", callId);
+
     emailToSocketMapping.set(userId, socket.id);
+
     socket.join(callId);
+    
     socket.emit('joined-call', {callId})
-    socket.broadcast.to(callId).emit("A new user joined", { username });
+
+    socket.broadcast.to(callId).emit("user-joined", { username, userId });
   });
 });
 

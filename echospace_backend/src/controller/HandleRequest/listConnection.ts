@@ -4,7 +4,6 @@ import prisma from "../../db/prismaDb";
 const listConnection = async (req: Request, res: Response) => {
   try {
     const senderId = req.query.userId as string;
-    // console.log(senderId)
 
     const user = await prisma.user.findUnique({
       where: { userId: senderId },
@@ -49,7 +48,6 @@ const listConnection = async (req: Request, res: Response) => {
           })
         );
 
-        // Filter out null values if any
         const validConnectedUsers = connectedUsers.filter(
           (userinfo) => userinfo !== null
         );

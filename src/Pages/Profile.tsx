@@ -6,6 +6,8 @@ import ProfileImage from "../components/Profile/ProfileImage";
 import Loading from "../utils/Loading";
 import NameSection from "../components/Profile/NameSection";
 import Videocall from "../components/Videocall";
+import { useNavigate } from "react-router-dom";
+import { useSocket } from "../Providers/Socket";
 // fetchcall
 interface ProfileData {
   id: string;
@@ -29,6 +31,33 @@ const Profile = () => {
   const [requestList, setRequestList] = useState<Request[]>([]);
   const [connectionList, setConnectionList] = useState<ProfileData[]>([]);
   const [callLists, setCallLists] = useState<ProfileData[]>([]);
+
+  const navigate = useNavigate();
+  const { socket } = useSocket();
+
+  const joinCall = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_SERVER_URL}/call/fetchcall`,
+        {
+          params: {
+            username: profile?.username,
+          },
+        }
+      );
+      const callId = response.data.calledUser[0].callId;
+
+      socket.emit("Join-call", {
+        userId: profile?.userId,
+        username: profile?.username,
+        callId: callId,
+      });
+      console.log(response.data.calledUser[0].callId);
+      navigate(`/home/${callId}`);
+    } catch (error) {
+      console.log("Internal server error");
+    }
+  };
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -104,7 +133,6 @@ const Profile = () => {
           senderId,
         }
       );
-      console.log(response);
     } catch (error) {
       console.log("Unable to accept request", error);
     }
@@ -249,7 +277,7 @@ const Profile = () => {
                     textColor="text-zinc-900"
                   />
                 </div>
-                <button>Accept Call</button>
+                <button onClick={joinCall}>Accept Call</button>
               </li>
             ))}
           </ul>
