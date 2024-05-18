@@ -24,7 +24,7 @@ const listRequest = async (req: Request, res: Response) => {
       return res.status(404).send({ message: "No requests found" });
     }
 
-    const senderIds = requestList.map(request => request.senderId);
+    const senderIds = requestList.map((request) => request.senderId);
 
     const senderProfiles = await prisma.profile.findMany({
       where: {
@@ -36,19 +36,25 @@ const listRequest = async (req: Request, res: Response) => {
         userId: true,
         username: true,
         image: true,
-       
       },
     });
 
-    const requestsWithSenders = requestList.map(request => {
-      const senderProfile = senderProfiles.find(profile => profile.userId === request.senderId);
+    const requestsWithSenders = requestList.map((request) => {
+      const senderProfile = senderProfiles.find(
+        (profile) => profile.userId === request.senderId
+      );
       return {
         ...request,
         senderProfile,
       };
     });
 
-    return res.status(200).send({ message: "Listing requests with sender profiles", requestsWithSenders });
+    return res
+      .status(200)
+      .send({
+        message: "Listing requests with sender profiles",
+        requestsWithSenders,
+      });
   } catch (error) {
     console.error("Error listing requests:", error);
     return res.status(500).send({ message: "Internal Server error" });

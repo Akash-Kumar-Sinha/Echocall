@@ -5,14 +5,16 @@ import Name from "../components/Profile/Name";
 import ProfileImage from "../components/Profile/ProfileImage";
 import Loading from "../utils/Loading";
 import NameSection from "../components/Profile/NameSection";
-import { BiChat, BiVideo } from "react-icons/bi";
-
+import Videocall from "../components/Videocall";
+// fetchcall
 interface ProfileData {
   id: string;
   username: string;
   createdAt: string;
   image: string | null;
   userId: string;
+  requestId?: string;
+  callId?: string;
 }
 
 interface Request {
@@ -26,6 +28,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [requestList, setRequestList] = useState<Request[]>([]);
   const [connectionList, setConnectionList] = useState<ProfileData[]>([]);
+  const [callLists, setCallLists] = useState<ProfileData[]>([]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -64,12 +67,29 @@ const Profile = () => {
           },
         }
       );
-      // console.log(response.data.requestsWithSenders[0].senderProfile);
       setRequestList(
         response.data.requestsWithSenders.map(
           (request) => request.senderProfile
         ) || []
       );
+    } catch (error) {
+      console.log("Unable to fetch requests:", error);
+    }
+  };
+
+  const listCall = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_SERVER_URL}/call/fetchcall`,
+        {
+          params: {
+            username: profile?.username,
+          },
+        }
+      );
+      // console.log(response.data.calledUser);
+      setCallLists(response.data.calledUser);
+      console.log("callList", callLists);
     } catch (error) {
       console.log("Unable to fetch requests:", error);
     }
@@ -105,6 +125,7 @@ const Profile = () => {
         }
       );
       setConnectionList(response.data.connections);
+      console.log(response.data);
     } catch (error) {
       console.log("Unable to fetch requests:", error);
     }
@@ -156,7 +177,9 @@ const Profile = () => {
       )}
       <div className="flex gap-4">
         <div>
-          <div onClick={listRequest}>ListRequest</div>
+          <div className="hover:cursor-pointer" onClick={listRequest}>
+            ListRequest
+          </div>
           <ul className="space-y-4">
             {requestList?.map((user) => (
               <li
@@ -185,7 +208,9 @@ const Profile = () => {
           </ul>
         </div>
         <div>
-          <div onClick={listConnection}>listConnection</div>
+          <div className="hover:cursor-pointer" onClick={listConnection}>
+            listConnection
+          </div>
           <ul className="space-y-4">
             {connectionList?.map((connection) => (
               <li
@@ -200,11 +225,36 @@ const Profile = () => {
                     textsize="xl"
                     textColor="text-zinc-900"
                   />
-                  <BiVideo
-                    className="text-black bg-white border rounded-xl"
-                    size={46}
+                  <Videocall
+                    roomId={connection.requestId}
+                    userId={connection.userId}
+                    username={connection.username}
                   />
                 </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <div className="hover:cursor-pointer" onClick={listCall}>
+            listCall
+          </div>
+          <ul className="space-y-4">
+            {callLists?.map((call) => (
+              <li
+                key={call.callId}
+                className="flex px-4 items-center justify-between p-2 lg:w-96 bg-yellow-50 rounded-lg shadow-lg text-black"
+              >
+                <div className="flex w-full items-center justify-between">
+                  <NameSection
+                    name={call.username}
+                    imageUrl={call.image}
+                    width={8}
+                    textsize="xl"
+                    textColor="text-zinc-900"
+                  />
+                </div>
+                <button>Accept Call</button>
               </li>
             ))}
           </ul>

@@ -29,27 +29,31 @@ const listConnection = async (req: Request, res: Response) => {
 
     if (connections && connections.length > 0) {
       try {
-        const connectedUsers = await Promise.all(connections.map(async (connection) => {
-          let userinfo;
-          if (connection.user1Id !== senderId) {
-            userinfo = await prisma.profile.findUnique({
-              where: {
-                userId: connection.user1Id
-              }
-            });
-          } else if (connection.user2Id !== senderId) {
-            userinfo = await prisma.profile.findUnique({
-              where: {
-                userId: connection.user2Id
-              }
-            });
-          }
-          return userinfo; // Accumulate the user info fetched
-        }));
-        
+        const connectedUsers = await Promise.all(
+          connections.map(async (connection) => {
+            let userinfo;
+            if (connection.user1Id !== senderId) {
+              userinfo = await prisma.profile.findUnique({
+                where: {
+                  userId: connection.user1Id,
+                },
+              });
+            } else if (connection.user2Id !== senderId) {
+              userinfo = await prisma.profile.findUnique({
+                where: {
+                  userId: connection.user2Id,
+                },
+              });
+            }
+            return { ...userinfo, requestId: connection.requestId }; // Accumulate the user info fetched
+          })
+        );
+
         // Filter out null values if any
-        const validConnectedUsers = connectedUsers.filter(userinfo => userinfo !== null);
-    
+        const validConnectedUsers = connectedUsers.filter(
+          (userinfo) => userinfo !== null
+        );
+
         return res.status(200).send({ connections: validConnectedUsers });
       } catch (error) {
         console.error("Error listing requests:", error);

@@ -15,7 +15,7 @@ function App() {
       {location.pathname !== "/" && <Sidebar />}
       <Routes>
         <Route path="/" element={<Auth />} />
-        <Route path="/home" element={<ProtectedRoute Protect={SpaceRoom} />} />
+        <Route path="/home/:roomId" element={<ProtectedRoute Protect={SpaceRoom} />} />
         <Route path="/profile" element={<ProtectedRoute Protect={Profile} />} />
         <Route path="/search" element={<ProtectedRoute Protect={SearchBar} />} />
       </Routes>

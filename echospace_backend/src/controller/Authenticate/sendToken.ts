@@ -27,7 +27,6 @@ const sendToken = async (req: Request, res: Response) => {
     }
 
     const token = String(await createToken(email));
-
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {

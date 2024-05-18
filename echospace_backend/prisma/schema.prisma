@@ -83,7 +83,7 @@ model Accepted {
   requestId String  @unique
   request   Request @relation(fields: [requestId], references: [id])
 
-  profileId String 
+  profileId String
   profile   Profile @relation(fields: [profileId], references: [userId])
 }
 
@@ -94,4 +94,14 @@ model Connection {
   user2Id   String
 
   @@unique([user1Id, user2Id])
+}
+
+model Call {
+  id     String @id @default(uuid())
+  callId String @unique
+
+  callActive    Boolean @default(false)
+  callInitiater String
+  callReceiver  String
+  callReceived  Boolean @default(false)
 }

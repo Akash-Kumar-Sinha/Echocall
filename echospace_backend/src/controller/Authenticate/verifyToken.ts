@@ -14,7 +14,7 @@ const verifyToken = async (req: Request, res: Response) => {
     if (user) {
       await prisma.emailVerification.update({
         where: {
-          email: email,
+          email: user.email,
         },
         data: {
           verification: true,

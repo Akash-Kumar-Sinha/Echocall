@@ -34,23 +34,26 @@ const SearchBar = () => {
 
   const onSearch = async (data) => {
     setButtonClicked(true);
+    const currentUserId = currentUser?.userId
+    const search = data.search
+    console.log(data.search)
     try {
+      if (!currentUserId) {
+        console.error('currentUserId is not defined');
+        return;
+      }
+      if (!data) {
+        console.error('Search data is not provided');
+        return;
+      }
       const response = await axios.get(
         `${import.meta.env.VITE_SERVER_URL}/get/searchuser`,
         {
-          params: { data },
+          params: { search,currentUserId },
         }
       );
-
-      const filteredOtherUsers = response.data.otheruser.filter(
-        (user: Profile) => {
-          return (
-            user.userId !== currentUser?.userId ||
-            user.username !== currentUser?.username
-          );
-        }
-      );
-      setOtherUser(filteredOtherUsers);
+      console.log(response.data.otheruser)
+      setOtherUser(response.data.otheruser);
     } catch (error) {
       console.log(error);
     }
@@ -120,7 +123,7 @@ const SearchBar = () => {
                     >
                     Add Friend
                   </button>
-                  }
+                   } 
                 </li>
               ))}
             </ul>
