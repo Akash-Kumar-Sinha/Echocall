@@ -52,7 +52,7 @@ const Profile = () => {
         username: profile?.username,
         callId: callId,
       });
-      console.log(response.data.calledUser[0].callId);
+      // console.log(response.data.calledUser[0].callId);
       navigate(`/home/${callId}`);
     } catch (error) {
       console.log("Internal server error");

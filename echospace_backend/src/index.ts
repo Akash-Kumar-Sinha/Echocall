@@ -39,20 +39,45 @@ app.use("/get", userRouter);
 
 app.use("/call", callRoute);
 
-const emailToSocketMapping = new Map();
+const userIdToSocketMapping = new Map();
+const socketToUserIdMapping = new Map();
+const userIdToUsernameMapping = new Map();
 
 io.on("connection", (socket) => {
   console.log(`User connected`);
   socket.on("Join-call", (data) => {
     const { userId, username, callId } = data;
+    // console.log("joined call", userId, username);
 
-    emailToSocketMapping.set(userId, socket.id);
+    userIdToSocketMapping.set(userId, socket.id);
+    socketToUserIdMapping.set(socket.id, userId);
+    userIdToUsernameMapping.set(userId, username);
 
     socket.join(callId);
-    
-    socket.emit('joined-call', {callId})
+
+    socket.emit("joined-call", { callId });
 
     socket.broadcast.to(callId).emit("user-joined", { username, userId });
+  });
+
+  socket.on("call-user", (data) => {
+    const { userId, username, offer } = data;
+    const fromUserId = socketToUserIdMapping.get(socket.id);
+    const socketId = userIdToSocketMapping.get(userId);
+    const fromUsername = userIdToUsernameMapping.get(fromUserId);
+    console.log("call-user", fromUserId, fromUsername);
+    socket.to(socketId).emit("incomming-call", {
+      from: fromUserId,
+      offer,
+      username: fromUsername,
+    });
+  });
+
+  socket.on("call-accepted", (data) => {
+    const { username, userId, ans } = data;
+    // console.log("call-accepted", data);
+    const socketId = userIdToSocketMapping.get(userId);
+    socket.to(socketId).emit("call-accepted", { ans });
   });
 });
 

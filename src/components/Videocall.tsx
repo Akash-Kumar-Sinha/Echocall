@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { BiVideo } from "react-icons/bi";
 import { useSocket } from "../Providers/Socket";
 import { useNavigate } from "react-router-dom";
@@ -15,13 +15,20 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
   const { socket } = useSocket();
   const navigate = useNavigate();
 
-  const handleRoomJoined = ({ callId }: { callId: string }) => {
-    navigate(`/home/${callId}`);
-  };
+  const handleRoomJoined = useCallback(
+    ({ callId }: { callId: string }) => {
+      navigate(`/home/${callId}`);
+    },
+    [navigate]
+  );
 
   useEffect(() => {
     socket.on("joined-call", handleRoomJoined);
-  }, [socket]);
+
+    return () => {
+      socket.off("joined-call", handleRoomJoined);
+    };
+  }, [socket, handleRoomJoined]);
 
   const vCall = async () => {
     const current = await getCurrentUser();
@@ -42,6 +49,9 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
       );
 
       if (response.status === 200) {
+        console.log("join call");
+        const userId = current.userId;
+        const username = current.username;
         await socket.emit("Join-call", { callId, userId, username });
       }
     }
