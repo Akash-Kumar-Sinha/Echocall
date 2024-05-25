@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -38,25 +32,21 @@ model User {
   password  String
   username  String   @unique
   createdAt DateTime @default(now())
-
-  userId  String   @unique
-  profile Profile?
+  userId    String   @unique
+  profile   Profile?
 
   @@unique([email, username])
 }
 
 model Profile {
-  id        String   @id @default(uuid())
-  username  String   @unique
-  createdAt DateTime @default(now())
+  id        String     @id @default(uuid())
+  username  String     @unique
+  createdAt DateTime   @default(now())
   image     String?
-  userId    String   @unique
-
-  user User @relation(fields: [userId], references: [userId])
-
-  requests Request[]
-
-  accepted Accepted[]
+  userId    String     @unique
+  accepted  Accepted[]
+  user      User       @relation(fields: [userId], references: [userId])
+  requests  Request[]
 }
 
 model Request {
@@ -66,10 +56,8 @@ model Request {
   sentAt     DateTime  @default(now())
   acceptedAt DateTime?
   accept     Boolean?  @default(false)
-
-  accepted Accepted[]
-
-  sender Profile @relation(fields: [senderId], references: [userId])
+  accepted   Accepted?
+  sender     Profile   @relation(fields: [senderId], references: [userId])
 
   @@unique([senderId, receiverId])
 }
@@ -79,12 +67,10 @@ model Accepted {
   senderId   String
   receiverId String
   acceptedAt DateTime @default(now())
-
-  requestId String  @unique
-  request   Request @relation(fields: [requestId], references: [id])
-
-  profileId String
-  profile   Profile @relation(fields: [profileId], references: [userId])
+  requestId  String   @unique
+  profileId  String
+  profile    Profile  @relation(fields: [profileId], references: [userId])
+  request    Request  @relation(fields: [requestId], references: [id])
 }
 
 model Connection {
@@ -97,9 +83,8 @@ model Connection {
 }
 
 model Call {
-  id     String @id @default(uuid())
-  callId String @unique
-
+  id            String  @id @default(uuid())
+  callId        String  @unique
   callActive    Boolean @default(false)
   callInitiater String
   callReceiver  String

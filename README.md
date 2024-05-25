@@ -1,4 +1,21 @@
-# React + TypeScript + Vite
+# Command to run the web app
+```shell
+  # Frontend setup
+  /EchoSpace$ npm install
+  /EchoSpace$ npm run dev
+
+  # Navigate to Backend
+  /EchoSpace$ cd echospace_backend 
+
+  # Backend setup
+  /EchoSpace/echospace_backend$ npm install
+  /EchoSpace/echospace_backend$ docker compose up -d
+  /EchoSpace/echospace_backend$ npx prisma generate
+  /EchoSpace/echospace_backend$ npx prisma db push
+  /EchoSpace/echospace_backend$ npm run dev
+```
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
