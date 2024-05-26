@@ -21,7 +21,7 @@ const listRequest = async (req: Request, res: Response) => {
     });
 
     if (!requestList || requestList.length === 0) {
-      return res.status(404).send({ message: "No requests found" });
+      return res.status(204).send({ message: "No requests found"});
     }
 
     const senderIds = requestList.map((request) => request.senderId);

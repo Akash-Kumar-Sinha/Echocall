@@ -3,17 +3,17 @@ import Input from "../components/Input";
 import axios from "axios";
 import { useState } from "react";
 import NameSection from "../components/Profile/NameSection";
-import getCurrentUser from "../utils/getCurrentUser";
+import { useProfile } from "../contexts/profileContext";
 
 interface Profile {
   username: string;
   image: string | null;
   userId: string;
-  hasConnection: boolean
+  hasConnection: boolean;
 }
 
 const SearchBar = () => {
-  const [currentUser, setCurrentUser] = useState<Profile | null>(null);
+  const { profile } = useProfile();
   const [otherUser, setOtherUser] = useState<Profile[]>([]);
   const [buttonClicked, setButtonClicked] = useState(false);
 
@@ -23,32 +23,23 @@ const SearchBar = () => {
     formState: { errors },
   } = useForm();
 
-  const findCurrentUser = async () => {
-    try {
-      const user = await getCurrentUser();
-      setCurrentUser(user);
-    } catch (error) {
-      console.log("Fetching user info");
-    }
-  };
-
   const onSearch = async (data) => {
     setButtonClicked(true);
-    const currentUserId = currentUser?.userId
-    const search = data.search
+    const currentUserId = profile?.userId;
+    const search = data.search;
     try {
       if (!currentUserId) {
-        console.error('currentUserId is not defined');
+        console.error("currentUserId is not defined");
         return;
       }
       if (!data) {
-        console.error('Search data is not provided');
+        console.error("Search data is not provided");
         return;
       }
       const response = await axios.get(
         `${import.meta.env.VITE_SERVER_URL}/get/searchuser`,
         {
-          params: { search,currentUserId },
+          params: { search, currentUserId },
         }
       );
       setOtherUser(response.data.otheruser);
@@ -59,12 +50,12 @@ const SearchBar = () => {
 
   const handleAddFriend = async (receiverId: string) => {
     try {
-      const senderId = currentUser?.userId;
-      const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/get/sendrequest`,
-        { senderId, receiverId }
-      );
-      console.log(response);
+      const senderId = profile?.userId;
+      // const response =
+      await axios.post(`${import.meta.env.VITE_SERVER_URL}/get/sendrequest`, {
+        senderId,
+        receiverId,
+      });
     } catch (error) {
       console.log("error in sending request", error);
     }
@@ -83,7 +74,6 @@ const SearchBar = () => {
             placeholder="Search"
             errors={errors}
             register={register}
-            onClick={findCurrentUser}
           />
         </span>
         <button
@@ -112,16 +102,16 @@ const SearchBar = () => {
                       textColor="text-zinc-900"
                     />
                   </div>
-                  {!user.hasConnection &&
-                  <button
-                    onClick={() => {
-                      handleAddFriend(user.userId);
-                    }}
-                    className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
+                  {!user.hasConnection && (
+                    <button
+                      onClick={() => {
+                        handleAddFriend(user.userId);
+                      }}
+                      className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
                     >
-                    Add Friend
-                  </button>
-                   } 
+                      Add Friend
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

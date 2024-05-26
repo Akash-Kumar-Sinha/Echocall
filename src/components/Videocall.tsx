@@ -3,7 +3,7 @@ import { BiVideo } from "react-icons/bi";
 import { useSocket } from "../Providers/Socket";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import getCurrentUser from "../utils/getCurrentUser";
+import { useProfile } from "../contexts/profileContext";
 
 interface VideocallProps {
   userId: string;
@@ -14,6 +14,7 @@ interface VideocallProps {
 const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
   const { socket } = useSocket();
   const navigate = useNavigate();
+  const { profile } = useProfile();
 
   const handleRoomJoined = useCallback(
     ({ callId }: { callId: string }) => {
@@ -31,8 +32,7 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
   }, [socket, handleRoomJoined]);
 
   const vCall = async () => {
-    const current = await getCurrentUser();
-    const senderUserId = current.userId;
+    const senderUserId = profile?.userId;
     const receiverUsername = username;
     if (roomId) {
       const now = new Date();
@@ -50,8 +50,8 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
 
       if (response.status === 200) {
         console.log("join call");
-        const userId = current.userId;
-        const username = current.username;
+        const userId = profile?.userId;
+        const username = profile?.username;
         await socket.emit("Join-call", { callId, userId, username });
       }
     }
