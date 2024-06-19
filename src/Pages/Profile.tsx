@@ -17,16 +17,7 @@ interface ProfileData {
   callId?: string;
 }
 
-// interface Request {
-//   userId: string;
-//   username: string;
-//   image: string | null;
-// }
-// interface RequestWithSender {
-//   senderProfile: ProfileData; 
-// }
 const Profile = () => {
-  // const [requestList, setRequestList] = useState<Request[]>([]);
   const [connectionList, setConnectionList] = useState<ProfileData[]>([]);
   const { profile, loading } = useProfile();
 
@@ -82,36 +73,32 @@ const Profile = () => {
               </div>
             </div>
           </div>
-         
 
-              <div className="flex-1">
-                <h2 className="text-xl text-yellow-600 mb-2">
-                  List Connection
-                </h2>
-                <ul className="space-y-4">
-                  {connectionList.map((connection) => (
-                    <li
-                      key={connection.id}
-                      className="flex w-96 justify-between items-center p-4 bg-yellow-50 rounded-lg shadow-lg text-black"
-                    >
-                      <NameSection
-                        name={connection.username}
-                        imageUrl={connection.image}
-                        width={8}
-                        textsize="xl"
-                        textColor="text-zinc-900"
-                      />
-                      <Videocall
-                        roomId={connection.requestId}
-                        userId={connection.userId}
-                        username={connection.username}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          
+          <div className="flex-1">
+            <h2 className="text-xl text-yellow-600 mb-2">List Connection</h2>
+            <ul className="space-y-4">
+              {connectionList.map((connection) => (
+                <li
+                  key={connection.id}
+                  className="flex w-96 justify-between items-center p-4 bg-yellow-50 rounded-lg shadow-lg text-black"
+                >
+                  <NameSection
+                    name={connection.username}
+                    imageUrl={connection.image}
+                    width={8}
+                    textsize="xl"
+                    textColor="text-zinc-900"
+                  />
+                  <Videocall
+                    roomId={connection.requestId}
+                    userId={connection.userId}
+                    username={connection.username}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       )}
     </div>
   );

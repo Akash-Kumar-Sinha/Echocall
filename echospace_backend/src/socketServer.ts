@@ -54,6 +54,13 @@ export const initializeSocket = (server: http.Server) => {
       const socketId = userIdToSocketMapping.get(userId);
       socket.to(socketId).emit("call-accepted", { ans });
     });
+
+  socket.on("entered-user", (data) => {
+    const { userId, stream } = data;
+    const socketId = userIdToSocketMapping.get(userId);
+    socket.to(socketId).emit("entered", {stream});
+  });
+
   });
 
   io.listen(socket_port);

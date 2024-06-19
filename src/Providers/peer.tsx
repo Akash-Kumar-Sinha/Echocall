@@ -7,6 +7,7 @@ import React, {
   useState,
   useCallback,
 } from "react";
+import { useSocket } from "./Socket";
 
 interface PeerContextType {
   peer: RTCPeerConnection;
@@ -35,20 +36,28 @@ export const usePeer = (): PeerContextType => {
 
 const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-  const peer = useMemo(
-    () =>
-      new RTCPeerConnection({
-        iceServers: [
-          {
-            urls: [
-              "stun:stun.l.google.com:19302",
-              "stun:global.stun.twilio.com:3478",
-            ],
-          },
-        ],
-      }),
-    []
-  );
+  const { socket } = useSocket();
+
+  const peer = useMemo(() => {
+    return new RTCPeerConnection({
+      'iceServers': [{ 'urls': "stun:stun.l.google.com:19302" }],
+    });
+  }, []);
+
+  // const peer = useMemo(
+  //   () =>
+  //     new RTCPeerConnection({
+  //       'iceServers': [
+  //         {
+  //           'urls': [
+  //             "stun:stun.l.google.com:19302",
+  //             "stun:global.stun.twilio.com:3478",
+  //           ],
+  //         },
+  //       ],
+  //     }),
+  //   []
+  // );
 
   const sendStream = async (stream: MediaStream) => {
     const tracks = stream.getTracks();
@@ -63,13 +72,13 @@ const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
     return offer;
   };
 
-  const createAnswer = async (offer: RTCSessionDescriptionInit) => {
-    await peer.setRemoteDescription(offer);
-    const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer);
+const createAnswer = async (offer: RTCSessionDescriptionInit) => {
+  await peer.setRemoteDescription(offer);
+  const answer = await peer.createAnswer();
+  await peer.setLocalDescription(answer);
+  return answer;
+};
 
-    return answer;
-  };
 
   const setRemoteAnswer = async (ans: RTCSessionDescriptionInit) => {
     await peer.setRemoteDescription(ans);
@@ -77,11 +86,48 @@ const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
 
   const handleTrackEvent = useCallback((ev: RTCTrackEvent) => {
     const streams = ev.streams;
-    setRemoteStream(streams[0]);
+    console.log("setremotestreams", streams[0]);
+    if (streams.length > 0) {
+      setRemoteStream(streams[0]);
+    } else {
+      const newStream = new MediaStream();
+      newStream.addTrack(ev.track);
+      setRemoteStream(newStream);
+    }
   }, []);
+  
+
+  const handleNewUserJoined = useCallback(
+    async (data: { username: string; userId: string }) => {
+      const { username, userId } = data;
+      // console.log("New user joined the room", username, userId);
+      const offer = await createOffer();
+      // console.log("call-user", username, userId);
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      setRemoteStream(stream)
+      // console.log("streamhandleuserjoinded", stream);
+      socket.emit("call-user", { username, userId, offer });
+      socket.emit("entered-user", {userId, stream });
+
+    },
+    [createOffer, socket]
+  );
+
+  useEffect(() => {
+    socket.on("user-joined", handleNewUserJoined);
+
+    return () => {
+      socket.off("user-joined", handleNewUserJoined);
+    };
+  }, [socket, handleNewUserJoined]);
 
   useEffect(() => {
     peer.addEventListener("track", handleTrackEvent);
+
     return () => {
       peer.removeEventListener("track", handleTrackEvent);
     };

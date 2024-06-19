@@ -5,7 +5,9 @@ import { useSocket } from "../Providers/Socket";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "../contexts/profileContext";
 import { IoCall } from "react-icons/io5";
+// import { usePeer } from "../Providers/peer";
 
+// unable to send the stream who has accepted the call
 interface ProfileData {
   id: string;
   username: string;
@@ -29,6 +31,7 @@ interface RequestWithSender {
 const NotificationBar = () => {
   const [callLists, setCallLists] = useState<ProfileData[]>([]);
   const [requestList, setRequestList] = useState<Request[]>([]);
+  // const {peer} = usePeer();
 
   const navigate = useNavigate();
   const { socket } = useSocket();
@@ -65,8 +68,16 @@ const NotificationBar = () => {
         socket.emit("Join-call", {
           userId: profile.userId,
           username: profile.username,
-          callId: callId,
+          callId,
         });
+        // const stream = await navigator.mediaDevices.getUserMedia({
+        //   video: true,
+        //   audio: true,
+        // });
+        // console.log("stream join call",stream);
+        // socket.emit("entered-user",{
+
+        // })
 
         navigate(`/home/${callId}`);
       }

@@ -22,7 +22,7 @@ const SearchBar = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-
+// console.log(profile)
   const onSearch = async (data) => {
     setButtonClicked(true);
     const currentUserId = profile?.userId;

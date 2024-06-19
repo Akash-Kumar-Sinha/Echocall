@@ -32,27 +32,36 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
   }, [socket, handleRoomJoined]);
 
   const vCall = async () => {
+    
     const senderUserId = profile?.userId;
+
+    // console.log("senderUserId",senderUserId);
+    // console.log("userId",userId);
     const receiverUsername = username;
     if (roomId) {
       const now = new Date();
       const time = now.getTime();
       const callId = `${roomId}-${time}`;
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/call/start`,
-        {
-          receiverUsername,
-          callId,
-          senderUserId,
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_SERVER_URL}/call/start`,
+          {
+            receiverUsername,
+            callId,
+            senderUserId,
+          }
+        );
+  
+        if (response.status === 200) {
+          console.log("join call");
+          const userId = profile?.userId;
+          const username = profile?.username;
+          await socket.emit("Join-call", { callId, userId, username });
+          console.log("joining call");
         }
-      );
-
-      if (response.status === 200) {
-        console.log("join call");
-        const userId = profile?.userId;
-        const username = profile?.username;
-        await socket.emit("Join-call", { callId, userId, username });
+      } catch (error) {
+        console.log("An error occurred while starting the call. Please try again.");
       }
     }
   };
