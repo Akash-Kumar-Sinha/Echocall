@@ -132,7 +132,7 @@ const Auth = () => {
     <div className="h-screen bg-zinc-900 flex flex-col gap-4 justify-center items-center w-screen ">
       <h1 className="text-yellow-600 text-4xl font-extrabold tracking-tight relative">
         <span className="text-6xl">Echo</span>
-        <span className="text-yellow-800">Space</span>
+        <span className="text-yellow-800">Call</span>
         <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-yellow-600 to-yellow-800 rounded-lg z-[-1] opacity-75"></span>
       </h1>
       <div

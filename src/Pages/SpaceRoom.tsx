@@ -7,7 +7,6 @@ import { FcEndCall } from "react-icons/fc";
 
 import { useSocket } from "../Providers/Socket";
 import { usePeer } from "../Providers/peer";
-import { useProfile } from "../contexts/profileContext";
 
 interface CallAcceptedData {
   ans: RTCSessionDescriptionInit;
@@ -47,8 +46,6 @@ const SpaceRoom = () => {
         video: true,
         audio: true,
       });
-      console.log("stream", stream);
-      console.log("Stream ID:", stream.id);
       setMyStream(stream);
       setMediaError(null);
     } catch (error) {
@@ -85,8 +82,6 @@ const SpaceRoom = () => {
   const handleIncomingCall = useCallback(
     async (data: IncomingCallData) => {
       const { from, offer, username } = data;
-      console.log(data);
-      console.log("Incoming call from ", username, offer, from);
       const ans = await createAnswer(offer);
       socket.emit("call-accepted", { username, ans, userId: from });
       setRemoteUsername(username);
@@ -98,9 +93,7 @@ const SpaceRoom = () => {
   const handleCallAccepted = useCallback(
     async (data: CallAcceptedData) => {
       const { ans } = data;
-      console.log("Call got accepted", ans);
       if (peer.signalingState === "have-local-offer") {
-        console.log("handleCallAccepted", ans);
         await setRemoteAnswer(ans);
       } else {
         console.error(
@@ -150,8 +143,6 @@ const SpaceRoom = () => {
   useEffect(() => {
     if (myStream) {
       sendStream(myStream);
-    } else {
-      console.log("myStream is null");
     }
   }, [myStream, sendStream]);
 
@@ -168,32 +159,31 @@ const SpaceRoom = () => {
       stopMediaStream(myStream);
       setMyStream(null);
     }
-  
+
     if (remoteStream) {
       stopMediaStream(remoteStream);
       resetRemoteStream();
     }
-  
+
     if (peer) {
       peer.getSenders().forEach((sender) => {
         if (sender.track) {
           sender.track.stop();
         }
       });
-  
+
       // New: close all receivers' tracks
       peer.getReceivers().forEach((receiver) => {
         if (receiver.track) {
           receiver.track.stop();
         }
       });
-  
+
       peer.close();
     }
-  
-    // New: Reset the peer connection
+
     resetPeer();
-  
+
     navigate("/profile");
     await axios.get(`${import.meta.env.VITE_SERVER_URL}/call/endcall`, {
       params: {
@@ -203,8 +193,7 @@ const SpaceRoom = () => {
 
     window.location.reload();
   };
-  
-  // Helper function to reset peer connection
+
   const resetPeer = () => {
     if (peer) {
       peer.onicecandidate = null;
@@ -215,7 +204,7 @@ const SpaceRoom = () => {
       peer.onicegatheringstatechange = null;
       peer.onconnectionstatechange = null;
     }
-  };  
+  };
 
   return (
     <div className="w-full h-screen bg-zinc-950 p-4 ring-4 m-2 rounded-3xl ring-yellow-800 shadow-yellow-500 shadow-lg flex flex-col justify-between">
@@ -266,7 +255,7 @@ const SpaceRoom = () => {
           className="bg-yellow-600 text-yellow-50 px-8 py-1 rounded-md shadow-md hover:bg-yellow-700 transition-colors"
           onClick={endCall}
         >
-          <FcEndCall size={40}/>
+          <FcEndCall size={40} />
         </button>
       </div>
     </div>

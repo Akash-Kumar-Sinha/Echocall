@@ -8,7 +8,7 @@ services:
     environment:
       - POSTGRES_USER=postgres_akash
       - POSTGRES_PASSWORD=aks7536
-      - POSTGRES_db=echospace
+      - POSTGRES_db=echocall
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:

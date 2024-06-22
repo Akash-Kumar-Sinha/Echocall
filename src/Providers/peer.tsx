@@ -72,7 +72,6 @@ const createAnswer = async (offer: RTCSessionDescriptionInit) => {
 
   const handleTrackEvent = useCallback((ev: RTCTrackEvent) => {
     const streams = ev.streams;
-    console.log("setremotestreams", streams[0]);
     if (streams.length > 0) {
       setRemoteStream(streams[0]);
     } else {
