@@ -18,6 +18,7 @@ interface PeerContextType {
   setRemoteAnswer: (answer: RTCSessionDescriptionInit) => Promise<void>;
   sendStream: (stream: MediaStream) => void;
   remoteStream: MediaStream | null;
+  resetRemoteStream: () => void;
 }
 
 interface PeerProviderProps {
@@ -43,21 +44,6 @@ const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
       'iceServers': [{ 'urls': "stun:stun.l.google.com:19302" }],
     });
   }, []);
-
-  // const peer = useMemo(
-  //   () =>
-  //     new RTCPeerConnection({
-  //       'iceServers': [
-  //         {
-  //           'urls': [
-  //             "stun:stun.l.google.com:19302",
-  //             "stun:global.stun.twilio.com:3478",
-  //           ],
-  //         },
-  //       ],
-  //     }),
-  //   []
-  // );
 
   const sendStream = async (stream: MediaStream) => {
     const tracks = stream.getTracks();
@@ -100,16 +86,13 @@ const createAnswer = async (offer: RTCSessionDescriptionInit) => {
   const handleNewUserJoined = useCallback(
     async (data: { username: string; userId: string }) => {
       const { username, userId } = data;
-      // console.log("New user joined the room", username, userId);
       const offer = await createOffer();
-      // console.log("call-user", username, userId);
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
       setRemoteStream(stream)
-      // console.log("streamhandleuserjoinded", stream);
       socket.emit("call-user", { username, userId, offer });
       socket.emit("entered-user", {userId, stream });
 
@@ -133,6 +116,10 @@ const createAnswer = async (offer: RTCSessionDescriptionInit) => {
     };
   }, [peer, handleTrackEvent]);
 
+  const resetRemoteStream = () => {
+    setRemoteStream(null);
+  };
+
   return (
     <PeerContext.Provider
       value={{
@@ -142,6 +129,7 @@ const createAnswer = async (offer: RTCSessionDescriptionInit) => {
         setRemoteAnswer,
         sendStream,
         remoteStream,
+        resetRemoteStream,
       }}
     >
       {children}

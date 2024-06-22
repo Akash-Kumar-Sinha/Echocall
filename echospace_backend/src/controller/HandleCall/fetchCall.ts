@@ -21,7 +21,7 @@ const fetchCall = async (req: Request, res: Response) => {
         callActive: true,
       },
     });
-
+    
     if (calls && calls.length > 0) {
       try {
         const calling = await Promise.all(

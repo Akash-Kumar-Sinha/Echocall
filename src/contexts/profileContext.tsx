@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface ProfileData {
   id: string;
@@ -21,6 +22,7 @@ const ProfileContext = createContext<ProfileContextProps | undefined>(undefined)
 export const ProfileProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -47,7 +49,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
     };
 
     fetchUserInfo();
-  }, []);
+  }, [profile, navigate]);
 
   return (
     <ProfileContext.Provider value={{ profile, loading }}>

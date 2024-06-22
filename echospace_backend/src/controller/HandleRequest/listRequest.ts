@@ -5,7 +5,7 @@ const listRequest = async (req: Request, res: Response) => {
   try {
     const receiverId = req.query.userId as string;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: { userId: receiverId },
     });
 
@@ -48,7 +48,6 @@ const listRequest = async (req: Request, res: Response) => {
         senderProfile,
       };
     });
-
     return res
       .status(200)
       .send({

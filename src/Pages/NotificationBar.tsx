@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import NameSection from "../components/Profile/NameSection";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useSocket } from "../Providers/Socket";
-import { useNavigate } from "react-router-dom";
-import { useProfile } from "../contexts/profileContext";
 import { IoCall } from "react-icons/io5";
-// import { usePeer } from "../Providers/peer";
+import { useNavigate } from "react-router-dom";
 
-// unable to send the stream who has accepted the call
+import NameSection from "../components/Profile/NameSection";
+import { useSocket } from "../Providers/Socket";
+import { useProfile } from "../contexts/profileContext";
+
 interface ProfileData {
   id: string;
   username: string;
@@ -31,7 +30,6 @@ interface RequestWithSender {
 const NotificationBar = () => {
   const [callLists, setCallLists] = useState<ProfileData[]>([]);
   const [requestList, setRequestList] = useState<Request[]>([]);
-  // const {peer} = usePeer();
 
   const navigate = useNavigate();
   const { socket } = useSocket();
@@ -52,7 +50,7 @@ const NotificationBar = () => {
           setCallLists(response.data.calledUser || []);
         }
       } catch (error) {
-        console.log("Unable to fetch requests:", error);
+        console.log("Unable to fetch call:", error);
         setCallLists([]);
       }
     };
@@ -70,14 +68,6 @@ const NotificationBar = () => {
           username: profile.username,
           callId,
         });
-        // const stream = await navigator.mediaDevices.getUserMedia({
-        //   video: true,
-        //   audio: true,
-        // });
-        // console.log("stream join call",stream);
-        // socket.emit("entered-user",{
-
-        // })
 
         navigate(`/home/${callId}`);
       }
@@ -132,73 +122,73 @@ const NotificationBar = () => {
 
   return (
     <div className=" bg-zinc-950 h-screen w-full m-2 p-4 ring-2 rounded-3xl ring-yellow-600">
-        <div className="flex flex-wrap gap-4">
-      <div className="flex">
+      <div className="flex flex-wrap gap-4">
+        <div className="flex">
+          <div className="col-md-6">
+            <div className="flex flex-col w-full">
+              <div className="flex text-3xl text-yellow-600 items-center gap-2 mb-5">
+                Call Logs <IoCall size={30} />
+              </div>
+              <ul className="space-y-4">
+                {callLists.length > 0 ? (
+                  callLists.map((call) => (
+                    <li
+                      key={call.callId}
+                      className="flex w-96 items-center justify-between p-2 bg-yellow-50 rounded-lg shadow-lg text-black"
+                    >
+                      <NameSection
+                        name={call.username}
+                        imageUrl={call.image}
+                        width={8}
+                        textsize="xl"
+                        textColor="text-zinc-900"
+                      />
+                      <button
+                        onClick={() => joinCall(call.callId || "")}
+                        className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
+                      >
+                        Accept Call
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-white">No call logs available</li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <div className="col-md-6">
           <div className="flex flex-col w-full">
             <div className="flex text-3xl text-yellow-600 items-center gap-2 mb-5">
-              Call Logs <IoCall size={30} />
+              Request
             </div>
-            <ul className="space-y-4">
-              {callLists.length > 0 ? (
-                callLists.map((call) => (
-                  <li
-                    key={call.callId}
-                    className="flex w-96 items-center justify-between p-2 bg-yellow-50 rounded-lg shadow-lg text-black"
+            <ul className="space-y-2">
+              {requestList.map((user) => (
+                <li
+                  key={user.userId}
+                  className="flex w-96 items-center justify-between p-2 bg-yellow-50 rounded-lg shadow-lg text-black"
+                >
+                  <NameSection
+                    name={user.username}
+                    imageUrl={user.image}
+                    width={8}
+                    textsize="xl"
+                    textColor="text-zinc-900"
+                  />
+                  <button
+                    onClick={() => acceptRequest(user.userId)}
+                    className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
                   >
-                    <NameSection
-                      name={call.username}
-                      imageUrl={call.image}
-                      width={8}
-                      textsize="xl"
-                      textColor="text-zinc-900"
-                    />
-                    <button
-                      onClick={() => joinCall(call.callId || "")}
-                      className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
-                    >
-                      Accept Call
-                    </button>
-                  </li>
-                ))
-              ) : (
-                <li className="text-white">No call logs available</li>
-              )}
+                    Accept
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </div>
-
-      {/* Request Section */}
-      <div className="col-md-6">
-        <div className="flex flex-col w-full">
-          <div className="flex text-3xl text-yellow-600 items-center gap-2 mb-5">
-            Request
-          </div>
-          <ul className="space-y-2">
-            {requestList.map((user) => (
-              <li
-                key={user.userId}
-                className="flex w-96 items-center justify-between p-2 bg-yellow-50 rounded-lg shadow-lg text-black"
-              >
-                <NameSection
-                  name={user.username}
-                  imageUrl={user.image}
-                  width={8}
-                  textsize="xl"
-                  textColor="text-zinc-900"
-                />
-                <button
-                  onClick={() => acceptRequest(user.userId)}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
-                >
-                  Accept
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div></div>
     </div>
   );
 };

@@ -35,8 +35,7 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
     
     const senderUserId = profile?.userId;
 
-    // console.log("senderUserId",senderUserId);
-    // console.log("userId",userId);
+    console.log("userId",userId);
     const receiverUsername = username;
     if (roomId) {
       const now = new Date();
@@ -54,11 +53,11 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
         );
   
         if (response.status === 200) {
-          console.log("join call");
+          // console.log("join call");
           const userId = profile?.userId;
           const username = profile?.username;
           await socket.emit("Join-call", { callId, userId, username });
-          console.log("joining call");
+          // console.log("joining call");
         }
       } catch (error) {
         console.log("An error occurred while starting the call. Please try again.");

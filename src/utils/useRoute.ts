@@ -3,7 +3,7 @@ import { RxAvatar } from "react-icons/rx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { handleSignout } from "./handleSignout";
 import { CiLogout } from "react-icons/ci";
-import { BiSearchAlt, BiSpaceBar } from "react-icons/bi";
+import { BiSearchAlt } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";
 
 const useRoute = () => {
@@ -12,12 +12,6 @@ const useRoute = () => {
 
   const route = useMemo(
     () => [
-      {
-        label: "Home",
-        href: "/home/:id",
-        icon: BiSpaceBar,
-        active: pathname.startsWith("/home"),
-      },
       {
         label: "Search",
         href: "/search",

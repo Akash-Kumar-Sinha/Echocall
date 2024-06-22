@@ -6,6 +6,7 @@ import Loading from "../utils/Loading";
 import NameSection from "../components/Profile/NameSection";
 import Videocall from "../components/Videocall";
 import { useProfile } from "../contexts/profileContext";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileData {
   id: string;
@@ -18,8 +19,10 @@ interface ProfileData {
 }
 
 const Profile = () => {
-  const [connectionList, setConnectionList] = useState<ProfileData[]>([]);
   const { profile, loading } = useProfile();
+  const navigate = useNavigate();
+
+  const [connectionList, setConnectionList] = useState<ProfileData[]>([]);
 
   useEffect(() => {
     const listConnection = async () => {
@@ -38,7 +41,7 @@ const Profile = () => {
       }
     };
     listConnection();
-  }, [profile]);
+  }, [profile, navigate, loading]);
 
   const formattedDate = profile?.createdAt
     ? new Date(profile?.createdAt).toLocaleDateString()

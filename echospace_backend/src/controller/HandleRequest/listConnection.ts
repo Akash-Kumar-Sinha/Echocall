@@ -5,7 +5,7 @@ const listConnection = async (req: Request, res: Response) => {
   try {
     const senderId = req.query.userId as string;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: { userId: senderId },
     });
 
@@ -44,7 +44,7 @@ const listConnection = async (req: Request, res: Response) => {
                 },
               });
             }
-            return { ...userinfo, requestId: connection.requestId }; // Accumulate the user info fetched
+            return { ...userinfo, requestId: connection.requestId };
           })
         );
 
