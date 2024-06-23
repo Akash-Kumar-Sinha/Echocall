@@ -3,7 +3,7 @@ import prisma from "../../db/prismaDb";
 
 const getStart = async (req: Request, res: Response) =>{
     try {
-        const { senderUserId, receiverUsername, callId } = req.body;
+        const { senderUserId, receiverUsername, callId, socketId } = req.body;
     
         const sendUser = await prisma.user.findUnique({
             where:{
@@ -25,6 +25,7 @@ const getStart = async (req: Request, res: Response) =>{
         const callConnection = await prisma.call.create({
             data:{
                 callId: callId,
+                socketId: socketId,
                 callActive: true,
                 callInitiater: senderUserId,
                 callReceiver: receiverUsername,

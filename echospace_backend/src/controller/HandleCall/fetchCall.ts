@@ -32,7 +32,7 @@ const fetchCall = async (req: Request, res: Response) => {
               },
             });
 
-            return { ...userinfo, callId: call.callId };
+            return { ...userinfo, callId: call.callId, socketId: call.socketId };
           })
         );
         return res.status(200).send({ calledUser: calling });

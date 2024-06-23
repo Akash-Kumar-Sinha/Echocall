@@ -1,6 +1,9 @@
+import { useProfile } from "../../contexts/profileContext";
 import getCurrentUser from "../../utils/getCurrentUser"
 
 const Add = () => {
+    const {profile} = useProfile();
+
 
   const handleAddFriend = async() =>{
     try {

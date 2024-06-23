@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { RxAvatar } from "react-icons/rx";
 import { useLocation, useNavigate } from "react-router-dom";
-import { handleSignout } from "./handleSignout";
+import { handleSignout } from "../handleSignout";
 import { CiLogout } from "react-icons/ci";
 import { BiSearchAlt } from "react-icons/bi";
 import { IoNotifications } from "react-icons/io5";

@@ -85,8 +85,11 @@ model Connection {
 model Call {
   id            String  @id @default(uuid())
   callId        String  @unique
+  socketId      String
   callActive    Boolean @default(false)
   callInitiater String
   callReceiver  String
   callReceived  Boolean @default(false)
+
+  @@unique([socketId, callActive])
 }

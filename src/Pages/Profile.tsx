@@ -4,9 +4,12 @@ import Name from "../components/Profile/Name";
 import ProfileImage from "../components/Profile/ProfileImage";
 import Loading from "../utils/Loading";
 import NameSection from "../components/Profile/NameSection";
-import Videocall from "../components/Videocall";
 import { useProfile } from "../contexts/profileContext";
 import { useNavigate } from "react-router-dom";
+import useSocket from "../utils/Hooks/useSocket";
+import Videocall from "../components/Videocall";
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 interface ProfileData {
   id: string;
@@ -18,12 +21,17 @@ interface ProfileData {
   callId?: string;
 }
 
+
 const Profile = () => {
   const { profile, loading } = useProfile();
   const navigate = useNavigate();
+  const { socket } = useSocket();
 
   const [connectionList, setConnectionList] = useState<ProfileData[]>([]);
 
+  if (!socket) {
+    throw new Error("Socket does not exist");
+  }
   useEffect(() => {
     const listConnection = async () => {
       try {

@@ -20,7 +20,7 @@ function App() {
           <Route path="/" element={<Auth />} />
 
           <Route
-            path="/home/:roomId"
+            path="/call/:roomId"
             element={<ProtectedRoute Protect={SpaceRoom} />}
           />
           <Route
