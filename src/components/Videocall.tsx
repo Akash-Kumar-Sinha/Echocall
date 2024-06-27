@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { BiVideo } from "react-icons/bi";
 
 import { useProfile } from "../contexts/profileContext";
-import useSocket from "../utils/Hooks/useSocket";
+import useSocket from "../socket/useSocket";
 
 interface VideocallProps {
   userId: string;

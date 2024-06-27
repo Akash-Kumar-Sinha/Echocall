@@ -9,8 +9,9 @@ const socket_port = parseInt(process.env.SOCKET_PORT || "8000", 10);
 const userIdToSocketMapping = new Map();
 const callIdToSocketMapping = new Map();
 const userIdToUsernameMapping = new Map();
+const usernameToSocketMapping = new Map();
 
-const socketToUserIdMapping = new Map();
+const socketToUsernameMapping = new Map();
 
 export const initializeSocket = (server: http.Server) => {
   const io = new Server(server, {
@@ -25,9 +26,11 @@ export const initializeSocket = (server: http.Server) => {
 
     socket.on("call-initiated", (data) => {
       const { userId, username, callId } = data;
-      // console.log(data);
       userIdToSocketMapping.set(userId, socket.id);
       callIdToSocketMapping.set(callId, socket.id);
+      usernameToSocketMapping.set(username, socket.id);
+      socketToUsernameMapping.set(socket.id, username)
+
       userIdToUsernameMapping.set(userId, username);
 
       socket.join(callId);
@@ -37,17 +40,41 @@ export const initializeSocket = (server: http.Server) => {
         .emit("user-joined", { username, userId, callId });
     });
 
+
     socket.on("call-accepted",(data)=>{
+      console.log("call-accepted")
       const {profileUserId, profileUsername, callId} = data;
+      userIdToSocketMapping.set(profileUserId, socket.id);
+
       socket.join(callId);
-      console.log(data);
-     
-      
+      socket.broadcast.to(callId).emit("user-joined",{profileUsername})
+    })
+
+    socket.on("call-user", (data)=>{
+      const  {username, offer, callId} = data;
+      const fromUsername = socketToUsernameMapping.get(socket.id)
+      const socketId = usernameToSocketMapping.get(username);
+      socket.to(socketId).emit("Incoming-Call", {fromUsername, offer, callId})
+    })
+
+    socket.on("call-started", (data)=>{
+      const  {username, ans} = data;
+      const socketId = usernameToSocketMapping.get(username);
+      socket.to(socketId).emit("call-started", {ans})
+
+    })
+
+    socket.on("new-ice-candidate", (data)=>{
+      const {candidate, username} = data;
+      // console.log(candidate, username);
+      const socketId = usernameToSocketMapping.get(username);
+      socket.to(socketId).emit("new-ice-candidate", {candidate})
+
+
     })
 
     socket.on('user-message', (data) => {
       const {message, callId} = data;
-      console.log("A message from", message);
       io.to(callId).emit("message", message);
     });
 

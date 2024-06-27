@@ -1,13 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+
 import Name from "../components/Profile/Name";
 import ProfileImage from "../components/Profile/ProfileImage";
 import Loading from "../utils/Loading";
 import NameSection from "../components/Profile/NameSection";
 import { useProfile } from "../contexts/profileContext";
 import { useNavigate } from "react-router-dom";
-import useSocket from "../utils/Hooks/useSocket";
 import Videocall from "../components/Videocall";
+import useSocket from "../socket/useSocket";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { IoCall } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import NameSection from "../components/Profile/NameSection";
 import { useProfile } from "../contexts/profileContext";
 import Loading from "../utils/Loading";
-import useSocket from "../utils/Hooks/useSocket";
+import useSocket from "../socket/useSocket";
 
 interface ProfileData {
   id: string;
@@ -69,24 +69,26 @@ const NotificationBar = () => {
   }, [profile, loading]);
 
 
-   const joinCall = (callId: string, userId: string, username: string) => {
+   const joinCall = (callId: string) => {
+    const userId = profile?.userId
+    const username = profile?.username
     socket.connect();
-    console.log(callId);
+    // console.log(callId);
     socket.emit("call-initiated", { userId, username, callId });
-    const profileUserId = profile?.userId;
-    const profileUsername = profile?.username;
+    // const profileUserId = profile?.userId;
+    // const profileUsername = profile?.username;
   
-    socket.emit("call-accepted", { profileUserId, profileUsername,  callId });
+    // socket.emit("call-accepted", { profileUserId, profileUsername,  callId });
     navigate(`/call/${callId}`);
   };
 
-  socket.on("calling", (callId) => {
-    console.log("Calling:", callId);
-  });
+  // socket.on("calling", (callId) => {
+  //   console.log("Calling:", callId);
+  // });
   
-  socket.on("user-joined", (data) => {
-    console.log("User joined:", data);
-  });
+  // socket.on("user-joined", (data) => {
+  //   console.log("User joined:", data);
+  // });
   
   
   socket.on("message", (message) => {
