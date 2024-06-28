@@ -9,8 +9,6 @@ import useSocket from "../socket/useSocket";
 import usePeer from "../webrtc/usePeer";
 import Loading from "../utils/Loading";
 
-/* eslint @typescript-eslint/no-unused-vars: "off" */
-
 interface callData {
   fromUsername: string;
   offer: RTCSessionDescriptionInit;
@@ -33,12 +31,11 @@ const SpaceRoom = () => {
     otherStream,
     connectedUsername,
     setConnectedUsername,
+    /* eslint @typescript-eslint/no-unused-vars:*/
     connectionState,
   } = usePeer();
 
-  const [message, setMessage] = useState("");
-  const [myStream, setMyStream] = useState<MediaStream | undefined>(undefined);
-  const [mediaError, setMediaError] = useState<string | null>(null);
+  const [myStream, setMyStream] = useState<MediaStream | null>(null);
 
   const nodeRef = useRef(null);
 
@@ -63,32 +60,6 @@ const SpaceRoom = () => {
   useEffect(() => {
     getUserMediaStream();
   }, [getUserMediaStream]);
-
-  // const constraints = {
-  //     'video': true,
-  //     'audio': true
-  // }
-  // navigator.mediaDevices.getUserMedia(constraints)
-  //     .then(stream => {
-  //         console.log('Got MediaStream:', stream);
-  //     })
-  //     .catch(error => {
-  //         console.error('Error accessing media devices.', error);
-  //     });
-
-  //   const saveMessage = (e) => {
-  //     setMessage(e.target.value);
-  //   };
-
-  useEffect(() => {
-    socket.on("message", (data) => {
-      console.log(data);
-    });
-
-    return () => {
-      socket.off("message");
-    };
-  }, [socket]);
 
   const OnEndCall = useCallback(async () => {
     closeCall();
@@ -120,7 +91,6 @@ const SpaceRoom = () => {
     async (data: callData) => {
       const { fromUsername, offer, callId } = data;
       setConnectedUsername(fromUsername);
-      console.log("handleIncomingCall");
       const ans = await createAnswer(offer);
       socket.emit("call-started", { username: fromUsername, ans });
     },
@@ -131,7 +101,6 @@ const SpaceRoom = () => {
     (data: callData) => {
       const { ans } = data;
       setAnswer(ans);
-      console.log("handleCallStarted");
     },
     [setAnswer]
   );
@@ -159,13 +128,11 @@ const SpaceRoom = () => {
   }, [callId, connectedUsername, peer, socket]);
 
   useEffect(() => {
-    peer.addEventListener("negotiation", handleNegotiation);
+    peer.addEventListener("negotiationneeded", handleNegotiation);
     return () => {
-      peer.removeEventListener("negotiation", handleNegotiation);
+      peer.removeEventListener("negotiationneeded", handleNegotiation);
     };
   }, [handleNegotiation, peer]);
-
-  console.log("connectionState", connectionState);
 
   useEffect(() => {
     if (myStream) {
@@ -176,57 +143,52 @@ const SpaceRoom = () => {
   }, [sendStream, myStream]);
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col items-center justify-between">
-      <h4 className="bg-zinc-900 text-yellow-50 text-sm mb-4 p-4 rounded-lg text-center">
-        {connectedUsername && (
-          <>
-            You are connected with{" "}
-            <span className="text-yellow-500">{connectedUsername}</span>
-          </>
-        )}
-      </h4>
+    <div className="p-6 relative w-full h-screen min-h-screen flex flex-col items-center justify-between">
+      {connectedUsername && (
+        <h4 className="bg-zinc-900 text-yellow-50 text-sm mb-4 p-4 rounded-lg text-center">
+          You are connected with{" "}
+          <span className="text-yellow-500">{connectedUsername}</span>
+        </h4>
+      )}
 
-      <div className="w-fit flex items-center justify-center">
-        {!otherStream ? (
-          <div className="w-full h-full flex items-center justify-center">
-            <Loading />
-          </div>
-        ) : (
-          <div className="relative border-2 border-yellow-500">
+      {!otherStream ? (
+        <div className="w-full h-full flex items-center justify-center">
+          <Loading />
+        </div>
+      ) : (
+        <div className="w-full max-w-screen-lg flex items-start justify-center">
+          <div className="relative border-2 border-yellow-500 rounded-lg overflow-hidden shadow-lg">
             <div className="absolute top-2 left-2 text-yellow-50 bg-zinc-900 bg-opacity-50 p-0 text-xs rounded overflow-hidden whitespace-nowrap">
-              {" "}
               Stream ID: {otherStream.id}
             </div>
             <ReactPlayer
               url={otherStream}
               playing
-              muted
               width="100%"
               height="100%"
               className="object-cover"
             />
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      <Draggable nodeRef={nodeRef}>
+      <Draggable nodeRef={nodeRef} bounds="parent">
         <div
           ref={nodeRef}
-          className="absolute bottom-16 right-12 w-40 md:w-32 bg-transparent border-2 bg-zinc-800 border-yellow-500 rounded shadow-lg overflow-hidden cursor-pointer"
+          className="absolute bottom-16 right-12 w-40 md:w-32 bg-transparent border-2 border-yellow-500 rounded-lg shadow-lg overflow-hidden cursor-pointer"
         >
           {!myStream ? (
             <div className="w-full h-full flex items-center justify-center">
               <Loading />
             </div>
           ) : (
-            <div>
+            <div className="relative">
               <div className="absolute top-2 left-2 text-yellow-50 bg-zinc-950 bg-opacity-50 p-0 rounded text-xs overflow-hidden whitespace-nowrap">
                 Stream ID: {myStream.id}
               </div>
               <ReactPlayer
                 url={myStream}
                 playing
-                muted
                 width="100%"
                 height="100%"
                 className="object-cover"
@@ -238,10 +200,11 @@ const SpaceRoom = () => {
 
       <div className="flex justify-center mt-4">
         <button
-          className="bg-yellow-600 text-yellow-50 px-8 py-1 rounded-md shadow-md hover:bg-yellow-700 transition-colors"
+          className="bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-md transition-colors flex items-center space-x-2"
           onClick={OnEndCall}
         >
-          <FcEndCall size={40} />
+          <FcEndCall size={24} />{" "}
+          <span className="font-semibold">End Call</span>
         </button>
       </div>
     </div>

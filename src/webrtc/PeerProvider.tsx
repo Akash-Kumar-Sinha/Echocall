@@ -6,7 +6,6 @@ interface PeerProviderProps {
   children: ReactNode;
 }
 
-/* eslint @typescript-eslint/no-unused-vars: "off" */
 const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
   const { socket } = useSocket();
   if (!socket) {
@@ -115,12 +114,10 @@ const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
     };
   }, [peer, handleTrackEvent]);
 
-  peer.addEventListener("connectionstatechange", (event) => {
+  peer.addEventListener("connectionstatechange", () => {
     if (peer.connectionState === "connected") {
-      console.log("Connected");
       setConnectionState(true);
     } else {
-      console.log("not connected");
       setConnectionState(false);
     }
   });
