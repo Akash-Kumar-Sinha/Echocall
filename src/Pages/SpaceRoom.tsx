@@ -10,6 +10,15 @@ import usePeer from "../webrtc/usePeer";
 import Loading from "../utils/Loading";
 
 /* eslint @typescript-eslint/no-unused-vars: "off" */
+
+interface callData {
+  fromUsername: string;
+  offer: RTCSessionDescriptionInit;
+  username: string;
+  callId: string;
+  ans: RTCSessionDescriptionInit;
+}
+
 const SpaceRoom = () => {
   const params = useParams();
   const navigate = useNavigate();
@@ -24,6 +33,7 @@ const SpaceRoom = () => {
     otherStream,
     connectedUsername,
     setConnectedUsername,
+    connectionState,
   } = usePeer();
 
   const [message, setMessage] = useState("");
@@ -54,21 +64,21 @@ const SpaceRoom = () => {
     getUserMediaStream();
   }, [getUserMediaStream]);
 
-// const constraints = {
-//     'video': true,
-//     'audio': true
-// }
-// navigator.mediaDevices.getUserMedia(constraints)
-//     .then(stream => {
-//         console.log('Got MediaStream:', stream);
-//     })
-//     .catch(error => {
-//         console.error('Error accessing media devices.', error);
-//     });
+  // const constraints = {
+  //     'video': true,
+  //     'audio': true
+  // }
+  // navigator.mediaDevices.getUserMedia(constraints)
+  //     .then(stream => {
+  //         console.log('Got MediaStream:', stream);
+  //     })
+  //     .catch(error => {
+  //         console.error('Error accessing media devices.', error);
+  //     });
 
-//   const saveMessage = (e) => {
-//     setMessage(e.target.value);
-//   };
+  //   const saveMessage = (e) => {
+  //     setMessage(e.target.value);
+  //   };
 
   useEffect(() => {
     socket.on("message", (data) => {
@@ -94,7 +104,7 @@ const SpaceRoom = () => {
   }, [callId, closeCall, navigate, socket]);
 
   const handleUserJoined = useCallback(
-    async (data) => {
+    async (data: callData) => {
       const { username } = data;
       if (username) {
         console.log(`${username} joined the room`);
@@ -107,9 +117,10 @@ const SpaceRoom = () => {
   );
 
   const handleIncomingCall = useCallback(
-    async (data) => {
+    async (data: callData) => {
       const { fromUsername, offer, callId } = data;
       setConnectedUsername(fromUsername);
+      console.log("handleIncomingCall");
       const ans = await createAnswer(offer);
       socket.emit("call-started", { username: fromUsername, ans });
     },
@@ -117,9 +128,10 @@ const SpaceRoom = () => {
   );
 
   const handleCallStarted = useCallback(
-    (data) => {
+    (data: callData) => {
       const { ans } = data;
       setAnswer(ans);
+      console.log("handleCallStarted");
     },
     [setAnswer]
   );
@@ -136,8 +148,9 @@ const SpaceRoom = () => {
     };
   }, [handleIncomingCall, handleUserJoined, handleCallStarted, socket]);
 
-  const handleNegotiation = useCallback(() => {
-    const localOffer = peer.createOffer();
+  const handleNegotiation = useCallback(async () => {
+    const localOffer = await peer.createOffer();
+    await peer.setLocalDescription(localOffer);
     socket.emit("call-user", {
       username: connectedUsername,
       offer: localOffer,
@@ -152,7 +165,7 @@ const SpaceRoom = () => {
     };
   }, [handleNegotiation, peer]);
 
-  console.log("myStream", myStream)
+  console.log("connectionState", connectionState);
 
   useEffect(() => {
     if (myStream) {
@@ -163,30 +176,25 @@ const SpaceRoom = () => {
   }, [sendStream, myStream]);
 
   return (
-    <div>
-      {connectedUsername && (
-        <h4 className="bg-zinc-900 text-yellow-50 text-sm mb-4 p-4 rounded-lg text-center">
-          You are connected with{" "}
-          <span className="text-yellow-500">{connectedUsername}</span>
-        </h4>
-      )}
+    <div className="relative w-full min-h-screen flex flex-col items-center justify-between">
+      <h4 className="bg-zinc-900 text-yellow-50 text-sm mb-4 p-4 rounded-lg text-center">
+        {connectedUsername && (
+          <>
+            You are connected with{" "}
+            <span className="text-yellow-500">{connectedUsername}</span>
+          </>
+        )}
+      </h4>
 
-      {/* <input type="text" onChange={saveMessage} className="text-black" /> */}
-      <div className="flex justify-center mt-4">
-        <button
-          className="bg-yellow-600 text-yellow-50 px-8 py-1 rounded-md shadow-md hover:bg-yellow-700 transition-colors"
-          onClick={OnEndCall}
-        >
-          <FcEndCall size={40} />
-        </button>
-      </div>
-
-      <div>
+      <div className="w-fit flex items-center justify-center">
         {!otherStream ? (
-          <Loading />
+          <div className="w-full h-full flex items-center justify-center">
+            <Loading />
+          </div>
         ) : (
-          <div>
+          <div className="relative border-2 border-yellow-500">
             <div className="absolute top-2 left-2 text-yellow-50 bg-zinc-900 bg-opacity-50 p-0 text-xs rounded overflow-hidden whitespace-nowrap">
+              {" "}
               Stream ID: {otherStream.id}
             </div>
             <ReactPlayer
@@ -200,13 +208,16 @@ const SpaceRoom = () => {
           </div>
         )}
       </div>
+
       <Draggable nodeRef={nodeRef}>
         <div
           ref={nodeRef}
           className="absolute bottom-16 right-12 w-40 md:w-32 bg-transparent border-2 bg-zinc-800 border-yellow-500 rounded shadow-lg overflow-hidden cursor-pointer"
         >
           {!myStream ? (
-            <Loading />
+            <div className="w-full h-full flex items-center justify-center">
+              <Loading />
+            </div>
           ) : (
             <div>
               <div className="absolute top-2 left-2 text-yellow-50 bg-zinc-950 bg-opacity-50 p-0 rounded text-xs overflow-hidden whitespace-nowrap">
@@ -224,6 +235,15 @@ const SpaceRoom = () => {
           )}
         </div>
       </Draggable>
+
+      <div className="flex justify-center mt-4">
+        <button
+          className="bg-yellow-600 text-yellow-50 px-8 py-1 rounded-md shadow-md hover:bg-yellow-700 transition-colors"
+          onClick={OnEndCall}
+        >
+          <FcEndCall size={40} />
+        </button>
+      </div>
     </div>
   );
 };

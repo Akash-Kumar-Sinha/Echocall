@@ -79,7 +79,7 @@ const createAnswer = async (offer: RTCSessionDescriptionInit) => {
       newStream.addTrack(ev.track);
       setRemoteStream(newStream);
     }
-  }, []);
+  }, [setRemoteStream]);
   
 
   const handleNewUserJoined = useCallback(

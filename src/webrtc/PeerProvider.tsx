@@ -16,6 +16,7 @@ const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
   const [otherStream, setOtherStream] = useState<MediaStream | null>(null);
   const [connectedUsername, setConnectedUsername] = useState("");
   const [addedTracks, setAddedTracks] = useState<Set<MediaStreamTrack>>(new Set());
+  const [connectionState, setConnectionState] = useState(false);
 
   const peer = useMemo(() => {
     const configuration = {
@@ -30,58 +31,60 @@ const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
     return offer;
   };
 
-  const createAnswer = async (
-    offer: RTCSessionDescriptionInit
-  ): Promise<RTCSessionDescriptionInit> => {
+  const createAnswer = async (offer: RTCSessionDescriptionInit) => {
     await peer.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
     return answer;
   };
 
-  const setAnswer = async (ans: RTCSessionDescriptionInit): Promise<void> => {
+  const setAnswer = async (ans: RTCSessionDescriptionInit) => {
     await peer.setRemoteDescription(new RTCSessionDescription(ans));
   };
 
-  const closeCall = async (): Promise<void> => {
+  const closeCall = async () => {
     await peer.close();
   };
 
-  const sendStream = async (stream: MediaStream): Promise<void> => {
-    stream.getTracks().forEach(track => {
+  const sendStream = async (stream: MediaStream) => {
+    const tracks = stream.getTracks();
+    for (const track of tracks) {
       if (!addedTracks.has(track)) {
-        peer.addTrack(track, stream);
+        await peer.addTrack(track, stream);
         setAddedTracks(prev => new Set(prev).add(track));
       }
-    });
+    }
   };
 
-  const handleTrackEvent = useCallback((event: RTCTrackEvent) => {
-    console.log("setOtherstream");
-    const streams = event.streams;
+  const handleTrackEvent = useCallback((ev: RTCTrackEvent) => {
+    const streams = ev.streams;
     if (streams.length > 0) {
       setOtherStream(streams[0]);
+    } else {
+      const newStream = new MediaStream();
+      newStream.addTrack(ev.track);
+      setOtherStream(newStream);
     }
   }, []);
 
-  let isIceCandidateSent = false;
+  const emitIceCandidate = useCallback(
+    (event: RTCPeerConnectionIceEvent) => {
+      if (event.candidate) {
+        socket.emit("new-ice-candidate", {
+          candidate: event.candidate,
+          username: connectedUsername,
+        });
+      }
+    },
+    [connectedUsername, socket]
+  );
 
-  peer.addEventListener("icecandidate", (event) => {
-    if (event.candidate && !isIceCandidateSent) {
-      socket.emit("new-ice-candidate", {
-        candidate: event.candidate,
-        username: connectedUsername,
-      });
-      isIceCandidateSent = true;
-    }
-  });
-
-  peer.addEventListener("icecandidateerror", () => {
-    isIceCandidateSent = false;
-  });
-  peer.addEventListener("icecandidateclose", () => {
-    isIceCandidateSent = false;
-  });
+  useEffect(() => {
+    peer.addEventListener("icecandidate", emitIceCandidate);
+    return () => {
+      peer.removeEventListener("icecandidate", emitIceCandidate);
+    };
+  }, [emitIceCandidate, peer]);
 
   const handleIceCandidate = useCallback(
     async (data: { candidate: RTCIceCandidateInit }) => {
@@ -112,11 +115,13 @@ const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
     };
   }, [peer, handleTrackEvent]);
 
-  peer.addEventListener('connectionstatechange', event => {
-    if (peer.connectionState === 'connected') {
-        console.log("Connected");
-    }else{
+  peer.addEventListener("connectionstatechange", (event) => {
+    if (peer.connectionState === "connected") {
+      console.log("Connected");
+      setConnectionState(true);
+    } else {
       console.log("not connected");
+      setConnectionState(false);
     }
   });
 
@@ -130,6 +135,7 @@ const PeerProvider: React.FC<PeerProviderProps> = ({ children }) => {
     otherStream,
     connectedUsername,
     setConnectedUsername,
+    connectionState,
   };
 
   return (

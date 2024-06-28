@@ -10,7 +10,7 @@ export interface PeerContextType {
   otherStream: MediaStream | null;
   connectedUsername: string;
   setConnectedUsername: React.Dispatch<React.SetStateAction<string>>;
-  // connected: boolean
+  connectionState: boolean
 }
 
 const PeerContext = createContext<PeerContextType | undefined>(undefined);
