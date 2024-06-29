@@ -9,15 +9,13 @@ interface ProfileImageProps {
 
 const ProfileImage: React.FC<ProfileImageProps> = ({ imageUrl, width }) => {
   return (
-    <>
-      <img
-        className={`rounded-full object-cover shadow-xl hover:cursor-pointer 
-        ${width && `lg:w-${width} w-16`}
+    <img
+      className={`rounded-full object-cover shadow-xl hover:cursor-pointer 
+        ${width && `lg:w-${width} w-12 md:w-16`}
         `}
-        src={imageUrl ? imageUrl : placeholderImage}
-        alt="profile"
-      />
-    </>
+      src={imageUrl ? imageUrl : placeholderImage}
+      alt="profile"
+    />
   );
 };
 

@@ -8,17 +8,25 @@ import Profile from "./Pages/Profile";
 import SearchBar from "./Pages/SearchBar";
 import NotificationBar from "./Pages/NotificationBar";
 import { ProfileProvider } from "./contexts/profileContext";
+import Mobilebar from "./components/Mobilebar";
 
 function App() {
   const location = useLocation();
 
+  const showSidebarAndMobilebar =
+    location.pathname !== "/" && !location.pathname.startsWith("/call/");
+
   return (
-    <div className="bg-black text-yellow-50 flex w-full gap-2">
-      {location.pathname !== "/" && <Sidebar />}
+    <div className="bg-zinc-950 h-full w-full text-yellow-50 flex gap-2">
+      {showSidebarAndMobilebar && (
+        <>
+          <Sidebar />
+          <Mobilebar />
+        </>
+      )}
       <ProfileProvider>
         <Routes>
           <Route path="/" element={<Auth />} />
-
           <Route
             path="/call/:roomId"
             element={<ProtectedRoute Protect={SpaceRoom} />}

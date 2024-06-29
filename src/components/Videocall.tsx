@@ -42,7 +42,6 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
   const onConnect = useCallback(() => {
     setIsConnected(true);
     setSocketId(String(socket.id));
-    console.log("Socket connected with ID:", socket.id);
   }, [socket]);
 
   useEffect(() => {
@@ -122,7 +121,10 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
           headers: error.response?.headers,
         });
       } else {
-        console.error("An unexpected error occurred while starting the call.", error);
+        console.error(
+          "An unexpected error occurred while starting the call.",
+          error
+        );
       }
     }
   };
@@ -130,8 +132,7 @@ const Videocall: React.FC<VideocallProps> = ({ userId, username, roomId }) => {
   return (
     <BiVideo
       onClick={vCall}
-      className="text-black bg-white border rounded-xl hover:cursor-pointer"
-      size={46}
+      className="text-yellow-700 rounded w-12 h-12 lg:w-16 lg:h-16 hover:cursor-pointer"
     />
   );
 };

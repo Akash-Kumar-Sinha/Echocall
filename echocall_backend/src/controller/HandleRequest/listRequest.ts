@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import prisma from "../../db/prismaDb";
 
 const listRequest = async (req: Request, res: Response) => {
@@ -21,7 +22,7 @@ const listRequest = async (req: Request, res: Response) => {
     });
 
     if (!requestList || requestList.length === 0) {
-      return res.status(204).send({ message: "No requests found"});
+      return res.status(204).send({ message: "No requests found" });
     }
 
     const senderIds = requestList.map((request) => request.senderId);
@@ -48,12 +49,10 @@ const listRequest = async (req: Request, res: Response) => {
         senderProfile,
       };
     });
-    return res
-      .status(200)
-      .send({
-        message: "Listing requests with sender profiles",
-        requestsWithSenders,
-      });
+    return res.status(200).send({
+      message: "Listing requests with sender profiles",
+      requestsWithSenders,
+    });
   } catch (error) {
     console.error("Error listing requests:", error);
     return res.status(500).send({ message: "Internal Server error" });

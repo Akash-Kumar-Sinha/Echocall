@@ -143,11 +143,15 @@ const SpaceRoom = () => {
   }, [sendStream, myStream]);
 
   return (
-    <div className="p-6 relative w-full h-screen min-h-screen flex flex-col items-center justify-between">
-      {connectedUsername && (
+    <div className="p-6 relative w-full h-full min-h-screen flex flex-col items-center justify-between">
+      {connectedUsername ? (
         <h4 className="bg-zinc-900 text-yellow-50 text-sm mb-4 p-4 rounded-lg text-center">
           You are connected with{" "}
           <span className="text-yellow-500">{connectedUsername}</span>
+        </h4>
+      ) : (
+        <h4 className="bg-zinc-900 text-yellow-50 text-sm mb-4 p-4 rounded-lg text-center">
+          Waiting for other user to join...
         </h4>
       )}
 

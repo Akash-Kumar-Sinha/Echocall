@@ -1,7 +1,9 @@
-import { useForm } from "react-hook-form";
-import Input from "../components/Input";
-import axios from "axios";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import axios from "axios";
+import { motion } from "framer-motion";
+
+import Input from "../components/Input";
 import NameSection from "../components/Profile/NameSection";
 import { useProfile } from "../contexts/profileContext";
 
@@ -10,6 +12,10 @@ interface Profile {
   image: string | null;
   userId: string;
   hasConnection: boolean;
+}
+
+interface FormData {
+  search: string;
 }
 
 const SearchBar = () => {
@@ -22,8 +28,8 @@ const SearchBar = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-// console.log(profile)
-  const onSearch = async (data) => {
+
+  const onSearch = async (data: FormData) => {
     setButtonClicked(true);
     const currentUserId = profile?.userId;
     const search = data.search;
@@ -51,7 +57,6 @@ const SearchBar = () => {
   const handleAddFriend = async (receiverId: string) => {
     try {
       const senderId = profile?.userId;
-      // const response =
       await axios.post(`${import.meta.env.VITE_SERVER_URL}/get/sendrequest`, {
         senderId,
         receiverId,
@@ -62,12 +67,17 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen bg-zinc-950 p-4 m-2 rounded-3xl border-4 border-yellow-800 shadow-yellow-500">
+    <div className="flex flex-col w-full min-h-screen bg-zinc-950 p-4 m-2 px-4 ring-2 rounded-3xl ring-yellow-600">
       <form
         onSubmit={handleSubmit(onSearch)}
         className="flex w-full p-2 flex-col lg:flex-row space-y-4 lg:space-x-4"
       >
-        <span className="w-full lg:w-auto p-2 text-gray-900 placeholder-gray-500 bg-transparent border-b-2 border-yellow-600 focus:outline-none focus:border-yellow-800">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full lg:w-auto p-2 text-gray-900 placeholder-gray-500 bg-transparent border-b-2 border-yellow-600 focus:outline-none focus:border-yellow-800"
+        >
           <Input
             id="search"
             type="text"
@@ -75,25 +85,35 @@ const SearchBar = () => {
             errors={errors}
             register={register}
           />
-        </span>
-        <button
+        </motion.div>
+        <motion.button
           type="submit"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           className="px-6 p-2 text-yellow-50 font-bold bg-yellow-600 rounded-lg hover:bg-yellow-800 focus:outline-none focus:bg-yellow-800 transition duration-300 ease-in-out"
         >
           Search
-        </button>
+        </motion.button>
       </form>
 
       {buttonClicked && (
-        <div className="mt-8">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mt-8"
+        >
           {otherUser.length > 0 ? (
-            <ul className="space-y-4">
+            <ul className="space-y-4 pb-20 ">
               {otherUser.map((user) => (
-                <li
+                <motion.li
                   key={user.userId}
-                  className="flex px-4 items-center justify-between p-2 lg:w-96 bg-yellow-50 rounded-lg shadow-lg text-black"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex p-2 lg:w-96 justify-between bg-yellow-50 rounded-lg shadow-yellow-50 shadow-md text-black"
                 >
-                  <div className="">
+                  <div className="flex justify-between items-center mb-2 sm:mb-0">
                     <NameSection
                       name={user.username}
                       imageUrl={user.image}
@@ -103,24 +123,31 @@ const SearchBar = () => {
                     />
                   </div>
                   {!user.hasConnection && (
-                    <button
+                    <motion.button
                       onClick={() => {
                         handleAddFriend(user.userId);
                       }}
-                      className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold px-4 rounded mt-2 sm:mt-0 sm:ml-2"
                     >
                       Add Friend
-                    </button>
+                    </motion.button>
                   )}
-                </li>
+                </motion.li>
               ))}
             </ul>
           ) : (
-            <div className="p-4 text-yellow-800 font-semibold text-2xl rounded-lg shadow-lg">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="p-4 text-yellow-800 font-semibold text-2xl rounded-lg shadow-lg"
+            >
               No user found
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   );

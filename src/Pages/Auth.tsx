@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { FaLock } from "react-icons/fa";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import Input from "../components/Input";
-import axios from "axios";
 
 type loginVariant = "VERIFY" | "VERIFIED" | "USERNAME" | "FINAL";
 
@@ -46,7 +47,10 @@ const Auth = () => {
         await axios
           .post(`${import.meta.env.VITE_SERVER_URL}/auth/signup`, data)
           .then((response) => {
-            sessionStorage.setItem(`${import.meta.env.VITE_TOKEN_NAME}`, response.data.token)
+            sessionStorage.setItem(
+              `${import.meta.env.VITE_TOKEN_NAME}`,
+              response.data.token
+            );
             navigate("/search");
           });
       }
@@ -55,8 +59,11 @@ const Auth = () => {
           `${import.meta.env.VITE_SERVER_URL}/auth/login`,
           data
         );
-        
-        sessionStorage.setItem(`${import.meta.env.VITE_TOKEN_NAME}`, response.data.token)
+
+        sessionStorage.setItem(
+          `${import.meta.env.VITE_TOKEN_NAME}`,
+          response.data.token
+        );
         if (response.status === 200) {
           navigate("/search");
         }
@@ -75,7 +82,7 @@ const Auth = () => {
         `${import.meta.env.VITE_SERVER_URL}/auth/send`,
         formData
       );
-     
+
       if (response.data.success === "EXIST") {
         setVariant(() => {
           const newVariant = "FINAL";
@@ -128,25 +135,38 @@ const Auth = () => {
     return () => clearTimeout(timeout);
   }, []);
 
+  const variants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="h-screen bg-zinc-900 flex flex-col gap-4 justify-center items-center w-screen ">
-      <h1 className="text-yellow-600 text-4xl font-extrabold tracking-tight relative">
-        <span className="text-6xl">Echo</span>
+    <div className="min-h-screen bg-zinc-950 flex flex-col justify-center items-center w-screen">
+      <h1 className="text-yellow-600 text-2xl md:text-5xl lg:text-6xl font-extrabold tracking-tight relative">
+        <span className="text-4xl md:text-7xl lg:text-8xl">Echo</span>
         <span className="text-yellow-800">Call</span>
         <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-yellow-600 to-yellow-800 rounded-lg z-[-1] opacity-75"></span>
       </h1>
-      <div
-        className={`${
-          loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-        } transition-opacity transform duration-1000 ease-in-out`}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={variants}
+        transition={{ duration: 1 }}
+        className={`${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"} transition-opacity transform duration-1000 ease-in-out w-full max-w-md md:max-w-lg lg:max-w-2xl mt-8 flex justify-center items-center`}
       >
         {loaded && (
-          <div className="lg:w-96 bg-gradient-to-br from-yellow-700 to-yellow-800 p-8 rounded-lg shadow-lg flex flex-col items-center max-w-md transition-all duration-300 ease-in-out transform hover:scale-105">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={variants}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="bg-gradient-to-br from-yellow-700 to-yellow-800 p-8 rounded-lg shadow-lg flex flex-col items-center w-full md:w-auto"
+          >
             <div className="bg-gradient-to-br from-yellow-600 to-yellow-800 rounded-full p-3 mb-4 shadow-lg">
               <FaLock className="text-yellow-50 text-5xl" />
             </div>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="w-full flex flex-col mb-4 ">
+            <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+              <div className="w-full flex flex-col space-y-4 md:space-y-6">
                 {(variant === "VERIFY" || variant === "VERIFIED") && (
                   <>
                     <Input
@@ -160,7 +180,7 @@ const Auth = () => {
                     />
                     {variant === "VERIFIED" && (
                       <p className="text-sm text-black">
-                        Check you email to verify{" "}
+                        Check your email to verify
                       </p>
                     )}
                   </>
@@ -176,7 +196,7 @@ const Auth = () => {
                       errors={errors}
                     />
                     <p className="text-sm text-black">
-                      Username should to be unique
+                      Username should be unique
                     </p>
                   </>
                 )}
@@ -187,45 +207,51 @@ const Auth = () => {
                     placeholder="Enter Password"
                     required={true}
                     register={register}
-                    title="Password should be more than 5 digit"
+                    title="Password should be more than 5 digits"
                     errors={errors}
                   />
                 )}
               </div>
               {variant === "VERIFY" && (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={onClickNext}
-                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
+                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full mt-4"
                 >
                   Verify
-                </button>
+                </motion.button>
               )}
-
+  
               {(variant === "VERIFIED" || variant === "USERNAME") && (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={onClickNext}
-                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
+                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full mt-4"
                 >
                   Next
-                </button>
+                </motion.button>
               )}
               {variant === "FINAL" && (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="submit"
-                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full"
+                  className="bg-yellow-700 hover:bg-yellow-800 text-yellow-50 font-semibold py-3 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out shadow-md border border-yellow-900 text-center w-full mt-4"
                 >
                   {submitting ? "Signing in..." : "Sign in"}
-                </button>
+                </motion.button>
               )}
             </form>
-            <p className="mt-6 text-sm text-gray-300">
+            <p className="mt-6 text-sm text-gray-300 text-center">
               Your privacy matters. We protect your data.
             </p>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 };
