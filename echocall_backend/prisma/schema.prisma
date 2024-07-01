@@ -52,6 +52,7 @@ model Profile {
 model Request {
   id         String    @id @default(uuid())
   senderId   String
+  senderUsername   String
   receiverId String
   sentAt     DateTime  @default(now())
   acceptedAt DateTime?

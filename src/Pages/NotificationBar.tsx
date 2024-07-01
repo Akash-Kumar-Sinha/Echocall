@@ -19,13 +19,13 @@ interface ProfileData {
 }
 
 interface Request {
-  userId: string;
-  username: string;
-  image: string | null;
-}
-
-interface RequestWithSender {
-  senderProfile: ProfileData;
+  id: string;
+  accept: boolean;
+  acceptedAt: string | null;
+  receiverId: string;
+  senderId: string;
+  senderUsername: string;
+  sentAt: string;
 }
 
 const NotificationBar = () => {
@@ -37,7 +37,7 @@ const NotificationBar = () => {
   const { profile, loading } = useProfile();
 
   if (!socket) {
-    throw Error("socket is not fount");
+    throw Error("socket is not found");
   }
 
   useEffect(() => {
@@ -88,17 +88,15 @@ const NotificationBar = () => {
             },
           }
         );
-        setRequestList(
-          response.data.requestsWithSenders.map(
-            (request: RequestWithSender) => request.senderProfile
-          ) || []
-        );
+        setRequestList(response.data.requestList || []);
       } catch (error) {
         console.log("Unable to fetch requests:", error);
       }
     };
-    listRequest();
-  }, [profile, navigate]);
+    if (profile) {
+      listRequest();
+    }
+  }, [profile]);
 
   const acceptRequest = async (senderId: string) => {
     try {
@@ -167,26 +165,30 @@ const NotificationBar = () => {
                   Request
                 </div>
                 <ul className="space-y-4">
-                  {requestList.map((user) => (
-                    <li
-                      key={user.userId}
-                      className="flex w-80 items-center justify-between p-2 bg-yellow-50 rounded-lg shadow-lg text-black"
-                    >
-                      <NameSection
-                        name={user.username}
-                        imageUrl={user.image}
-                        width={8}
-                        textsize="xl"
-                        textColor="text-zinc-900"
-                      />
-                      <button
-                        onClick={() => acceptRequest(user.userId)}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
+                  {requestList.length > 0 ? (
+                    requestList.map((request) => (
+                      <li
+                        key={request.id}
+                        className="flex w-80 items-center justify-between p-2 bg-yellow-50 rounded-lg shadow-lg text-black"
                       >
-                        Accept
-                      </button>
-                    </li>
-                  ))}
+                        <NameSection
+                          name={request.senderUsername} // Adjust this if you have sender profile details
+                          imageUrl={null} // Adjust this if you have sender profile details
+                          width={8}
+                          textsize="xl"
+                          textColor="text-zinc-900"
+                        />
+                        <button
+                          onClick={() => acceptRequest(request.senderId)}
+                          className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded"
+                        >
+                          Accept
+                        </button>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-white">No requests available</li>
+                  )}
                 </ul>
               </div>
             </div>

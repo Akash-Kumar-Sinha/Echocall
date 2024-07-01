@@ -4,7 +4,7 @@ import prisma from "../../db/prismaDb";
 const sendRequest = async (req: Request, res: Response) => {
   try {
     
-    const { senderId, receiverId } = req.body;
+    const { senderId, receiverId,senderUsername } = req.body;
 
     const senderExists = await prisma.profile.findUnique({
       where: { userId: senderId },
@@ -20,6 +20,7 @@ const sendRequest = async (req: Request, res: Response) => {
       data: {
         senderId,
         receiverId,
+        senderUsername,
       },
     });
     

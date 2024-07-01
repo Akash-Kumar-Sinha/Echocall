@@ -57,8 +57,10 @@ const SearchBar = () => {
   const handleAddFriend = async (receiverId: string) => {
     try {
       const senderId = profile?.userId;
+      const senderUsername = profile?.username
       await axios.post(`${import.meta.env.VITE_SERVER_URL}/get/sendrequest`, {
         senderId,
+        senderUsername,
         receiverId,
       });
     } catch (error) {
