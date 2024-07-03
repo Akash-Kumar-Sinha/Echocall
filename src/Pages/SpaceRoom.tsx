@@ -62,17 +62,42 @@ const SpaceRoom = () => {
   }, [getUserMediaStream]);
 
   const OnEndCall = useCallback(async () => {
+    socket.emit("end-call", { callId });
+
     closeCall();
     socket.disconnect();
 
+    if (myStream) {
+      myStream.getTracks().forEach((track) => track.stop());
+    }
     navigate("/profile");
+    window.location.reload();
 
     await axios.get(`${import.meta.env.VITE_SERVER_URL}/call/endcall`, {
       params: {
         callId: callId,
       },
     });
-  }, [callId, closeCall, navigate, socket]);
+  }, [callId, closeCall, navigate, socket, myStream]);
+
+  useEffect(() => {
+    // Listener for ending the call
+    const handleEndCall = () => {
+      closeCall();
+      if (myStream) {
+        myStream.getTracks().forEach((track) => track.stop());
+      }
+      socket.disconnect();
+      navigate("/profile");
+      window.location.reload();
+    };
+
+    socket.on("end-call", handleEndCall);
+
+    return () => {
+      socket.off("end-call", handleEndCall);
+    };
+  }, [closeCall, myStream, navigate, socket]);
 
   const handleUserJoined = useCallback(
     async (data: callData) => {
@@ -105,17 +130,35 @@ const SpaceRoom = () => {
     [setAnswer]
   );
 
+  const handleEndCall = useCallback(() => {
+    closeCall();
+    if (myStream) {
+      myStream.getTracks().forEach((track) => track.stop());
+    }
+    socket.disconnect();
+    navigate("/profile");
+    window.location.reload();
+  }, [closeCall, myStream, navigate, socket]);
+
   useEffect(() => {
     socket.on("user-joined", handleUserJoined);
     socket.on("Incoming-Call", handleIncomingCall);
     socket.on("call-started", handleCallStarted);
+    socket.on("end-call", handleEndCall);
 
     return () => {
       socket.off("user-joined", handleUserJoined);
       socket.off("Incoming-Call", handleIncomingCall);
       socket.off("call-started", handleCallStarted);
+      socket.off("end-call", handleEndCall);
     };
-  }, [handleIncomingCall, handleUserJoined, handleCallStarted, socket]);
+  }, [
+    handleIncomingCall,
+    handleUserJoined,
+    handleCallStarted,
+    socket,
+    handleEndCall,
+  ]);
 
   const handleNegotiation = useCallback(async () => {
     const localOffer = await peer.createOffer();
